@@ -2,3 +2,9 @@
 node_modules/
 web/webapp/data/
 npm-debug.log
+
+*.o
+*.a
+*.so
+
+tickerCtrl/runText

@@ -1,6 +1,7 @@
-CFLAGS=-Wall -O3 -g
+#CFLAGS=-Wall -O3 -g
+CFLAGS=-Wall -Wextra -O3 -g
 CXXFLAGS=$(CFLAGS)
-OBJECTS=runText.o
+OBJECTS=ImageScroller.o runText.o
 BINARIES=runText
 
 # Where our library resides. You mostly only need to change the
@@ -17,8 +18,8 @@ all : $(BINARIES)
 $(RGB_LIBRARY): FORCE
 	$(MAKE) -C $(RGB_LIBDIR)
 
-runText : runText.o $(RGB_LIBRARY)
-	$(CXX) $< -o $@ $(LDFLAGS)
+runText : $(OBJECTS) $(RGB_LIBRARY)
+	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
 
 # Since the C example uses the C++ library underneath, which depends on C++
 # runtime stuff, you still have to also link -lstdc++
@@ -33,6 +34,7 @@ c-example : c-example.o $(RGB_LIBRARY)
 
 clean:
 	rm -f $(OBJECTS) $(BINARIES)
+	$(MAKE) -C $(RGB_LIBDIR) clean
 
 FORCE:
 .PHONY: FORCE
