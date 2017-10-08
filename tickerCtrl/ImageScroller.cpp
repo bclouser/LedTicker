@@ -31,8 +31,9 @@ extern volatile bool interrupt_received;
 // _very_ simplified. Can only read binary P6 PPM. Expects newlines in headers
 // Not really robust. Use at your own risk :)
 // This allows reload of an image while things are running, e.g. you can
-// life-update the content.
+// live-update the content.
 bool ImageScroller::LoadPPM(const char *filename) {
+    m_fileName = filename;
     FILE *f = fopen(filename, "r");
     // check if file exists
     if (f == NULL && access(filename, F_OK) == -1) {
@@ -91,7 +92,7 @@ void ImageScroller::Run() {
             usleep(100 * 1000);
             continue;
         }
-        printf("horizontal_position_ = %d\n", horizontal_position_);
+        //printf("horizontal_position_ = %d\n", horizontal_position_);
         //printf("current_image_.width = %d\n", current_image_.width);
         bool imageOffScreen = false;
         for (int x = 0; x < screen_width; ++x) {
@@ -121,7 +122,7 @@ void ImageScroller::Run() {
         }
         if(imageOffScreen){
             // This is where we should send out message to inform anyone listening that our image is offscreen
-            printf("Send message indicating message is off screen\n");
+            printf("Picture just rolled off screen.\n");
         }
     }
 }

@@ -29,6 +29,9 @@ public:
     }
 
     bool LoadPPM(const char *filename);
+    bool reLoadPPM(){
+        return LoadPPM(m_fileName);
+    }
     void Run();
 
     private:
@@ -61,6 +64,8 @@ public:
 
     const int scroll_jumps_;
     const int scroll_ms_;
+
+    const char* m_fileName;
 
     // Current image is only manipulated in our thread.
     Image current_image_;

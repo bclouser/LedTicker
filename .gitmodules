@@ -4,3 +4,9 @@
 [submodule "tickerCtrl/cppzmq"]
 	path = tickerCtrl/cppzmq
 	url = https://github.com/zeromq/cppzmq.git
+[submodule "tickerCtrl/libzmq"]
+	path = tickerCtrl/libzmq
+	url = https://github.com/zeromq/libzmq.git
+[submodule "tickerCtrl/jsoncpp"]
+	path = tickerCtrl/jsoncpp
+	url = https://github.com/open-source-parsers/jsoncpp.git

@@ -1,7 +1,7 @@
 #CFLAGS=-Wall -O3 -g
-CFLAGS=-Wall -Wextra -O3 -g
-CXXFLAGS=$(CFLAGS)
-OBJECTS=ImageScroller.o runText.o
+CFLAGS=-Wall -Wextra -O3 -g -Ilibzmq/include
+CXXFLAGS=$(CFLAGS) -std=c++11
+OBJECTS=ImageScroller.o runText.o MessageHandler.o
 BINARIES=runText
 
 # Where our library resides. You mostly only need to change the
@@ -9,22 +9,39 @@ BINARIES=runText
 RGB_LIB_DISTRIBUTION=rpi-rgb-led-matrix
 RGB_INCDIR=$(RGB_LIB_DISTRIBUTION)/include
 RGB_LIBDIR=$(RGB_LIB_DISTRIBUTION)/lib
-RGB_LIBRARY_NAME=rgbmatrix
-RGB_LIBRARY=$(RGB_LIBDIR)/lib$(RGB_LIBRARY_NAME).a
-LDFLAGS+=-L$(RGB_LIBDIR) -l$(RGB_LIBRARY_NAME) -lrt -lm -lpthread
+RGB_LIB_NAME=rgbmatrix
+RGB_LIB=$(RGB_LIBDIR)/lib$(RGB_LIB_NAME).a
+
+ZMQ_LIB_NAME=zmq
+ZMQ_REPO_DIR=libzmq
+ZMQ_LIB_DIR=libzmq/src/.libs
+ZMQ_LIB=$(ZMQ_LIB_DIR)/lib$(ZMQ_LIB_NAME).a
+
+JSON_LIB_NAME=jsoncpp
+JSON_REPO_DIR=jsoncpp
+JSON_LIB_DIR=$(JSON_REPO_DIR)/build/src/lib_json
+JSON_LIB= $(JSON_LIB_DIR)/libjsoncpp.a
+
+# TODO, we really can't be statically linking zmq, its huge!!!
+LDFLAGS+=-L$(RGB_LIBDIR) -l$(RGB_LIB_NAME) -L$(ZMQ_LIB_DIR) -l:libzmq.a -L$(JSON_LIB_DIR) -l$(JSON_LIB_NAME) -lrt -lm -lpthread
 
 all : $(BINARIES)
+$(JSON_LIB):
+	cd $(JSON_REPO_DIR) && mkdir -p build
+	cd $(JSON_REPO_DIR)/build && cmake -DCMAKE_TOOLCHAIN_FILE=../../rpiToolchainFile.cmake ..
+	# Get out of here unit tests! IDGAF
+	$(MAKE) -C $(JSON_REPO_DIR)/build jsoncpp_lib_static
 
-$(RGB_LIBRARY): FORCE
+$(ZMQ_LIB):
+	cd $(ZMQ_REPO_DIR) && ./autogen.sh
+	cd $(ZMQ_REPO_DIR) && CC=$(CC) CXX=$(CXX) ./configure --host=arm-linux-gnueabihf
+	$(MAKE) -C $(ZMQ_REPO_DIR)
+
+$(RGB_LIB): FORCE
 	$(MAKE) -C $(RGB_LIBDIR)
 
-runText : $(OBJECTS) $(RGB_LIBRARY)
+$(BINARIES): $(OBJECTS) $(RGB_LIB) $(ZMQ_LIB) $(JSON_LIB)
 	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
-
-# Since the C example uses the C++ library underneath, which depends on C++
-# runtime stuff, you still have to also link -lstdc++
-c-example : c-example.o $(RGB_LIBRARY)
-	$(CC) $< -o $@ $(LDFLAGS) -lstdc++
 
 %.o : %.cpp
 	$(CXX) -I$(RGB_INCDIR) $(CXXFLAGS) -c -o $@ $<
@@ -35,6 +52,7 @@ c-example : c-example.o $(RGB_LIBRARY)
 clean:
 	rm -f $(OBJECTS) $(BINARIES)
 	$(MAKE) -C $(RGB_LIBDIR) clean
+	$(MAKE) -C $(ZMQ_REPO_DIR) clean
 
 FORCE:
 .PHONY: FORCE

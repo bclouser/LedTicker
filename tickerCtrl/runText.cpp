@@ -3,6 +3,7 @@
 #include <signal.h>
 
 #include "ImageScroller.h"
+#include "MessageHandler.h"
 
 #define TERM_ERR  "\033[1;31m"
 #define TERM_NORM "\033[0m"
@@ -74,11 +75,12 @@ int main(int argc, char *argv[]) {
             large_display = true;
             break;
         }
-    }
+    }   
+    printf("optind = %d and argc = %d\n", optind, argc);
 
     if (optind < argc) {
-        printf("setting imageFilePath to be %s\n", imageFilePath);
         imageFilePath = argv[optind];
+        printf("setting imageFilePath to be %s\n", imageFilePath);
     }
 
     if (rotation % 90 != 0) {
@@ -105,27 +107,18 @@ int main(int argc, char *argv[]) {
     printf("Size: %dx%d. Hardware gpio mapping: %s\n",
                  matrix->width(), matrix->height(), matrix_options.hardware_mapping);
 
-    Canvas *canvas = matrix;
-
-    // The ThreadedCanvasManipulator objects are filling
-    // the matrix continuously.
-    ThreadedCanvasManipulator *image_gen = NULL;
-
-    if (imageFilePath) {
-        ImageScroller *scroller = new ImageScroller(matrix, scroll_jumps, scroll_ms);
-        if (!scroller->LoadPPM(imageFilePath)){
-            return 1;
-        }
-        image_gen = scroller;
-    } else {
-        fprintf(stderr, "scrolling text with scroll_jumps of %d Requires PPM image as parameter\n", scroll_jumps);
+    if (imageFilePath == NULL) {
+        printf("Bad image path. Program requires PPM image as parameter\n");
         return 1;
     }
 
-    if (image_gen == NULL){
-        printf("Image_gen is NULL. Fail\n");
+    ImageScroller imageScroller(matrix, scroll_jumps, scroll_ms);
+
+    if (!imageScroller.LoadPPM(imageFilePath)){
+        printf("Failed to load image. is it a valid ppm image?\n");
         return 1;
     }
+
     // Set up an interrupt handler to be able to stop animations while they go
     // on. Note, each demo tests for while (running() && !interrupt_received) {},
     // so they exit as soon as they get a signal.
@@ -133,7 +126,9 @@ int main(int argc, char *argv[]) {
     signal(SIGINT, InterruptHandler);
 
     // Image generating demo is crated. Now start the thread.
-    image_gen->Start();
+    imageScroller.Start();
+    MessageHandler msgHandler(imageScroller);
+    msgHandler.start();
 
     // Now, the image generation runs in the background. We can do arbitrary
     // things here in parallel. In this demo, we're essentially just
@@ -149,8 +144,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Stop image generating thread. The delete triggers
-    delete image_gen;
-    delete canvas;
+    delete matrix;
 
     printf("\%s. Exiting.\n", interrupt_received ? "Received CTRL-C" : "Timeout reached");
     return 0;
