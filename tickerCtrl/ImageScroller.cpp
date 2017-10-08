@@ -66,7 +66,6 @@ bool ImageScroller::LoadPPM(const char *filename) {
     fclose(f);
     fprintf(stderr, "Read image '%s' with %dx%d\n", filename,
                     new_width, new_height);
-    horizontal_position_ = 0;
     MutexLock l(&mutex_new_image_);
     new_image_.Delete();  // in case we reload faster than is picked up
     new_image_.image = new_image;
@@ -77,36 +76,50 @@ bool ImageScroller::LoadPPM(const char *filename) {
 
 
 void ImageScroller::Run() {
+    bool imageOffScreen = true;
     const int screen_height = offscreen_->height();
     const int screen_width = offscreen_->width();
+    // Start negative b/c we want to have our image enter one row at a time
+    horizontal_position_ = (-screen_width);
     while (running() && !interrupt_received) {
         {
             MutexLock l(&mutex_new_image_);
-            if (new_image_.IsValid()) {
+            // Dont apply new image until we are done scrolling image off screen
+            if (new_image_.IsValid() && imageOffScreen) {
+                printf("Loading new image\n");
                 current_image_.Delete();
                 current_image_ = new_image_;
                 new_image_.Reset();
+                horizontal_position_ = (-screen_width);
             }
         }
+        // Not sure why this is here
         if (!current_image_.IsValid()) {
             usleep(100 * 1000);
             continue;
         }
+
+        imageOffScreen = false;
         //printf("horizontal_position_ = %d\n", horizontal_position_);
+        //printf("scroll_jumps_ = %d\n", scroll_jumps_);
         //printf("current_image_.width = %d\n", current_image_.width);
-        bool imageOffScreen = false;
         for (int x = 0; x < screen_width; ++x) {
             // Check for when we have completely scrolled the image off the screen.
-            if((horizontal_position_+x) == current_image_.width) {
+            if((horizontal_position_+x) == (current_image_.width)) {
                 // reset horizontal_position
-                horizontal_position_ = 0;
+                horizontal_position_ = (-screen_width);
                 imageOffScreen = true;
                 break;
             }
             for (int y = 0; y < screen_height; ++y) {
-                const Pixel &p = current_image_.getPixel(
-                    (horizontal_position_ + x) % current_image_.width, y);
-                offscreen_->SetPixel(x, y, p.red, p.green, p.blue);
+                if(horizontal_position_+x < 0){
+                    offscreen_->SetPixel(x, y, 0, 0, 0);
+                }
+                else{
+                    const Pixel &p = current_image_.getPixel(
+                        (horizontal_position_ + x) % current_image_.width, y);
+                    offscreen_->SetPixel(x, y, p.red, p.green, p.blue);
+                }
             }
         }
         offscreen_ = matrix_->SwapOnVSync(offscreen_);
@@ -119,10 +132,6 @@ void ImageScroller::Run() {
             current_image_.Delete();
         } else {
             usleep(scroll_ms_ * 1000);
-        }
-        if(imageOffScreen){
-            // This is where we should send out message to inform anyone listening that our image is offscreen
-            printf("Picture just rolled off screen.\n");
         }
     }
 }

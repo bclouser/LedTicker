@@ -16,8 +16,8 @@ int main ()
     std::cout << "Connecting to hello world server…" << std::endl;
     socket.connect ("tcp://192.168.1.29:5555");
 
-    zmq::message_t request;
-    memcpy (request.data (), "Hello", 5);
+    zmq::message_t request(14);
+    memcpy (request.data(), "{\"command\":12}", 14);
     std::cout << "Sending Hello " << std::endl;
     socket.send (request);
 
