@@ -2,9 +2,6 @@
 
 
 
-
-
-
 DATE_STRING=$(date +"%a %m/%d/%y, %I:%M %P")
 echo $DATE_STRING
 
@@ -13,7 +10,7 @@ TABLESAFE_PROCESS_STRING="\"Processed: \""
 TABLESAFE_PROCESSED="\$3500.87"
 TABLESAFE_PROCESS_STRING="\"Transactions: \""
 TABLESAFE_PROCESS_STRING="\"Avg Daily: \""
-TABLESAFE_BEER_POURED="8.267 Gallons"
+TABLESAFE_BEER_POURED="8.267 Gal"
 
 set -x
 
@@ -32,19 +29,24 @@ set -x
 #convert -background black -fill green -font Nimbus-Sans-L-Bold -depth 8 -border 0x0 -size 800x20 -pointsize 18 label:"Hello World                " -trim +repage  hello.ppm
 # Tune the crop at the end to get rid of pixels at the top
 
+#Font from https://www.dafont.com/bitmap.php
+
 #-density 18
-convert -background "#000000" -border 0x0 -depth 2 \
-    -fill purple -font Gothic -depth 8 -pointsize 10 label:''"${DATE_STRING}"'    ' \
-    -fill red -font Gothic -depth 1 -pointsize 18 label:'TableSafe Processed: ' \
-    -fill green -font Gothic -depth 1 -pointsize 18 label:''"${TABLESAFE_PROCESSED}"'      ' \
+convert -background "#000000" -antialias -border 0x0 -depth 8\
+    -fill purple -antialias -font VCR-OSD-Mono -pointsize 14 label:''"${DATE_STRING}"'    '\
+    -fill blue -antialias -font VCR-OSD-Mono -pointsize 60 label:'TableSafe Processed:  '\
+    -fill green -antialias -font VCR-OSD-Mono -pointsize 60 label:''"${TABLESAFE_PROCESSED}"'      ' \
 	pint_dark.ppm +append \
 	pint_dark.ppm +append \
     pint_dark.ppm +append \
-	-fill "#000000" -font Gothic -depth 1 -pointsize 18 label:'_' \
-    -fill green -font Gothic -depth 1 -pointsize 18 label:''"${TABLESAFE_BEER_POURED}"' ' \
-	-fill "#000000" -font Gothic -depth 1 -pointsize 18 label:'.                             ' \
-	+append tickerString.ppm 
-convert tickerString.ppm -sharpen 0x20 tickerStringSharp.ppm
+	-fill "#000000" -font VCR-OSD-Mono -pointsize 60 label:'_' \
+    -fill green -depth 8 -font VCR-OSD-Mono -pointsize 14 label:''"${TABLESAFE_BEER_POURED}"' ' \
+	pint_dark.ppm +append \
+	pint_dark.ppm +append \
+    pint_dark.ppm +append \
+	-fill "#000000" -font VCR-OSD-Mono -pointsize 60 label:'...........................' \
+	-depth 8 -antialias +append -resize 25% tickerString.ppm
+convert tickerString.ppm -sharpen 0x3 tickerStringSharp.ppm
 
 #convert pint.png -background "#000000" +append testBeer.ppm
 if [ "$1" == "run" ];then
