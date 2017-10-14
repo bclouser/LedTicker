@@ -9,3 +9,4 @@ npm-debug.log
 
 tickerCtrl/runText
 tickerCtrl/zmqClient
+generateImage/testPPMParser

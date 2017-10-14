@@ -34,18 +34,18 @@ set -x
 #-density 18
 convert -background "#000000" -antialias -border 0x0 -depth 8\
     -fill purple -antialias -font VCR-OSD-Mono -pointsize 14 label:''"${DATE_STRING}"'    '\
-    -fill blue -antialias -font VCR-OSD-Mono -pointsize 60 label:'TableSafe Processed:  '\
-    -fill green -antialias -font VCR-OSD-Mono -pointsize 60 label:''"${TABLESAFE_PROCESSED}"'      ' \
+    -fill blue -antialias -font VCR-OSD-Mono -pointsize 15 label:'TableSafe Processed:  '\
+    -fill green -antialias -font VCR-OSD-Mono -pointsize 15 label:''"${TABLESAFE_PROCESSED}"'      ' \
 	pint_dark.ppm +append \
 	pint_dark.ppm +append \
     pint_dark.ppm +append \
-	-fill "#000000" -font VCR-OSD-Mono -pointsize 60 label:'_' \
+	-fill "#000000" -font VCR-OSD-Mono -pointsize 15 label:'_' \
     -fill green -depth 8 -font VCR-OSD-Mono -pointsize 14 label:''"${TABLESAFE_BEER_POURED}"' ' \
 	pint_dark.ppm +append \
 	pint_dark.ppm +append \
     pint_dark.ppm +append \
-	-fill "#000000" -font VCR-OSD-Mono -pointsize 60 label:'...........................' \
-	-depth 8 -antialias +append -resize 25% tickerString.ppm
+	-fill "#000000" -font VCR-OSD-Mono -pointsize 15 label:'...........................' \
+	-depth 8 -antialias +append tickerString.ppm
 convert tickerString.ppm -sharpen 0x3 tickerStringSharp.ppm
 
 #convert pint.png -background "#000000" +append testBeer.ppm
