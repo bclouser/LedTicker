@@ -1,7 +1,7 @@
 #CFLAGS=-Wall -O3 -g
 CFLAGS=-Wall -Wextra -O3 -g -Ilibzmq/include -Ijsoncpp/include
 CXXFLAGS=$(CFLAGS) -std=c++11
-OBJECTS=ImageScroller.o runText.o MessageHandler.o
+OBJECTS=ImageScroller.o runText.o MessageHandler.o ImageGen.o
 BINARIES=runText
 
 # Where our library resides. You mostly only need to change the
@@ -35,7 +35,7 @@ $(JSON_LIB):
 $(ZMQ_LIB):
 	cd $(ZMQ_REPO_DIR) && ./autogen.sh
 	cd $(ZMQ_REPO_DIR) && CC=$(CC) CXX=$(CXX) ./configure --host=arm-linux-gnueabihf
-	$(MAKE) -C $(ZMQ_REPO_DIR)
+	$(MAKE) -j8 -C $(ZMQ_REPO_DIR)
 
 $(RGB_LIB): FORCE
 	$(MAKE) -C $(RGB_LIBDIR)

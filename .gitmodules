@@ -1,6 +1,6 @@
 [submodule "tickerCtrl/rpi-rgb-led-matrix"]
 	path = tickerCtrl/rpi-rgb-led-matrix
-	url = https://github.com/hzeller/rpi-rgb-led-matrix.git
+	url = https://github.com/bclouser/rpi-rgb-led-matrix.git
 [submodule "tickerCtrl/cppzmq"]
 	path = tickerCtrl/cppzmq
 	url = https://github.com/zeromq/cppzmq.git

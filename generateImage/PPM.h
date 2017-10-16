@@ -4,16 +4,15 @@
 #include <vector>
 
 struct Pixel{
-	short red;
-	short green;
-	short blue;
-	long x;
-	long y;
+	uint8_t red;
+	uint8_t green;
+	uint8_t blue;
 };
 
 class PPM {
 public:
 	bool init(const char* filename=NULL);
+	bool read(const char* fileName);
 	bool add(const std::vector<std::vector<Pixel>>& rasterIn);
 	bool save();
 	unsigned getWidth() const{

@@ -14,13 +14,23 @@ so there will likely only be 16 rows and a shit ton of columns
 
 
 bool PPM::init(const char* filename){
-
 	m_fileName=filename;
+	return true;
+}
+
+bool PPM::read(const char* fileName){
 	// parse header info
+	std::ifstream input;
+	input.open(fileName, std::ifstream::in);
+
+	if(!input.is_open()){
+		std::cout << "Failed to open input file" << std::endl;
+		return false;
+	}
+
+	
 
 	// Set m_width, m_height, and m_maxColorVal
-
-	return true;
 }
 
 std::vector<std::vector<Pixel>>::const_iterator PPM::begin() const{
@@ -118,22 +128,6 @@ bool PPM::save(){
 	//std::cout << "Just saved data to file: " << m_fileName << std::endl;
 	return true;
 }
-
-	/*
-bool putPixel(const Pixel& pixel){
-	// 2d array makes sense. 
-	std::vector<std::vector<Pixel>> m_ppmRaster;
-
-	m_ppmRaster[pixel.x][pixel.y].x = pixel.x;
-	m_ppmRaster[pixel.x][pixel.y].y = pixel.y;
-	m_ppmRaster[pixel.x][pixel.y].red = pixel.red;
-	m_ppmRaster[pixel.x][pixel.y].green = pixel.green
-	m_ppmRaster[pixel.x][pixel.y].blue= pixel.blue;
-
-
-	// you gotta add something, where you leave off... std column?
-}
-	*/
 
 // Lookup the colors for a pixel specified by width and height
 bool getPixel(Pixel& pixel){

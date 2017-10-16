@@ -2,9 +2,8 @@
 
 CFLAGS=-Wall -Wextra -O3
 CXXFLAGS=$(CFLAGS) -std=c++11
-OBJECTS=PPM.o main.o
+OBJECTS=PPM.o main.o BDF.o
 BINARIES=testPPMParser
-
 
 
 

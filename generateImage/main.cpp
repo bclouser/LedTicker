@@ -1,9 +1,13 @@
 #include <iostream>
 #include "PPM.h"
+#include "BDF.h"
 
+
+extern void rgb_matrix::doImage();
 
 int main()
 {
+	/*
 	std::cout << "Creating PPM" << std::endl;
 	PPM basePpm;
 	std::cout << "Calling init" << std::endl;
@@ -32,15 +36,20 @@ int main()
 	smallPPM.printPretty();
 
 
-
-
 	std::cout << "About to add smallPPM to basePpm" << std::endl;
 	// for every pixel in character
 	basePpm.add(smallPPM.getRaster());
 
 	basePpm.printPretty();
 	basePpm.save();
+	*/
 
+	BDF bdf;
+	bdf.load("10x20.bdf");
+
+	const uint32_t* bitmap = bdf.getBitMap('A');
+
+	doImage
 
 	return 0;
 }
