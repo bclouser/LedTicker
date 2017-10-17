@@ -11,6 +11,13 @@
 
 using namespace rgb_matrix;
 
+struct Pixel {
+    Pixel() : red(0), green(0), blue(0){}
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+};
+
 class ImageScroller : public ThreadedCanvasManipulator {
 public:
     // Scroll image with "scroll_jumps" pixels every "scroll_ms" milliseconds.
@@ -35,12 +42,6 @@ public:
     void Run();
 
     private:
-        struct Pixel {
-            Pixel() : red(0), green(0), blue(0){}
-            uint8_t red;
-            uint8_t green;
-            uint8_t blue;
-        };
 
     struct Image {
         Image() : width(-1), height(-1), image(NULL) {}

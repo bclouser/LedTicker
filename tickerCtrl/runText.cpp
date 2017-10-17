@@ -10,6 +10,10 @@
 
 volatile bool interrupt_received = false;
 
+namespace ImageGen{
+    void doImage();
+}
+
 static void InterruptHandler(int signo) {
     interrupt_received = true;
 }
@@ -129,6 +133,9 @@ int main(int argc, char *argv[]) {
     imageScroller.Start();
     MessageHandler msgHandler(imageScroller);
     msgHandler.start();
+
+    // Move this around probably
+    ImageGen::doImage();
 
     // Now, the image generation runs in the background. We can do arbitrary
     // things here in parallel. In this demo, we're essentially just
