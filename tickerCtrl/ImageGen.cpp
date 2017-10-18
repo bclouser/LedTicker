@@ -7,8 +7,7 @@
 
 
 namespace ImageGen{
-
-	Pixel* createImage(){
+	Image createImage(){
 		std::string testString("Ben Says Hello");
 		rgb_matrix::Font font;
 
@@ -16,23 +15,29 @@ namespace ImageGen{
 			std::cout << "Failed to load font" << std::endl;
 		}
 
-		pixelCount = testString.len() * 10 * 20;
+		int pixelCount = testString.length() * 10 * 20;
 
 		// Color of specified text. Obviously make this dynamic later
-		Pixel textColor = {128, 128, 128};
+		Pixel textColor;
+		textColor.red = 128;
+		textColor.green = 128;
+		textColor.blue = 128;
+		unsigned numBitsPerRow = (sizeof(rowbitmap_t)*8);
 
-		// Obviously make this dynamic
-		numRows = 20;
+		// Obviously make these dynamic
+		int numRows = 20;
+		int currentWidth = 0;
 
 		// create the whole container
-		Pixel *newImage = new Pixel [ pixelCount ];
+		Pixel *pixels = new Pixel [ pixelCount ];
 
 		// calculate the size of our image
-		std::vector<const rgb_matrix::Glyph*> glyphs;
+		//std::vector<const rgb_matrix::Glyph*> glyphs;
 		std::string::iterator it = testString.begin();
 		while (it != testString.end()) {
 		 	const uint32_t codepoint = utf8_next_codepoint(it);
-			const rgb_matrix::Glyph* glyph = font.FindGlyph(codepoint)
+		 	std::cout << "CodePoint = " << codepoint << std::endl;
+			const rgb_matrix::Glyph* glyph = font.FindGlyph(codepoint);
 			if(glyph == NULL){
 				std::cout << "glyph null for char: " << *it << std::endl;
 				continue; 
@@ -40,34 +45,52 @@ namespace ImageGen{
 			if(glyph->height != numRows){
 				std::cout << "Warning: Glyph mismatch. glyph height = " << glyph->height << "image height = " << numRows <<std::endl;
 			}
-
+			std::cout << "numRows = " << numRows << " numColumns = " << glyph->width << std::endl;
 			for(int row = 0; row < numRows; ++row){
-				for(int i = 0; i < glyph->width; ++i){
-					if(glyph.bitmap[numRows] & 1<<i){
-						newImage[currentWidth*row + i].red = textColor.red;
-						newImage[currentWidth*row + i].green = textColor.green;
-						newImage[currentWidth*row + i].blue = textColor.blue;
-					}
-					else{
-						newImage[currentWidth*row + i].red = 0x00;
-						newImage[currentWidth*row + i].green = 0x00;
-						newImage[currentWidth*row + i].blue = 0x00;
+				printf("bitmap[%d]: = 0x%llX\n", row, glyph->bitmap[row] );
+				if(glyph->bitmap[row]){
+					std::cout << "Ok so there is something at row: " << row << std::endl;
+					for(int column = 0; column < glyph->width; ++column){
+						if(glyph->bitmap[row] & (rowbitmap_t)(1<<(numBitsPerRow)-column)){
+							std::cout << "setting pixel for (" << row << "," << column << ")" << std::endl;
+							pixels[currentWidth*row + column].red = textColor.red;
+							pixels[currentWidth*row + column].green = textColor.green;
+							pixels[currentWidth*row + column].blue = textColor.blue;
+						}
+						else{
+							pixels[currentWidth*row + column].red = 0x00;
+							pixels[currentWidth*row + column].green = 0x00;
+							pixels[currentWidth*row + column].blue = 0x00;
+						}
 					}
 				}
 			}
-			current
 
-			glyphs.push_back(glyph);
+			currentWidth += glyph->width;
+
+			//glyphs.push_back(glyph);
 			std::cout << "glyph height: " << glyph->height << " glyph width: " << glyph->width <<std::endl;
 		}
+		Image img;
+		img.pixels=pixels;
+		img.width=currentWidth;
+		img.height=numRows;
+		return img;
+	}
 
-		
-		std::vector<const rgb_matrix::Glyph*>::iterator it=glyph;
-		for(std::vector<const rgb_matrix::Glyph*>::iterator it=begin; )
-		for(int i = 0; i < pixelCount; ++i){
-			newImage[i].red = textColor.red;
+
+	void printPretty(Image& img){
+		std::cout << "Image Height: " << img.height << "\n";
+		std::cout << "Image Width: " << img.width << "\n";
+		for(int row = 0; row < img.height; ++row){
+			std::cout << row << " |";
+			for(int column=0; column < img.width; ++column){
+				int currentIndex = row*img.width + column;
+				std::cout <<img.pixels[currentIndex].red  << img.pixels[currentIndex].green  << img.pixels[currentIndex].blue << "|";
+			}
+			std::cout <<"\n";
 		}
-		return newImage;
+		std::cout << "|" <<std::endl;
 	}
 }
 

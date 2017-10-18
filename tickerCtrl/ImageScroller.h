@@ -18,6 +18,13 @@ struct Pixel {
     uint8_t blue;
 };
 
+struct Image{
+    Image():pixels(NULL), width(0), height(0){}
+    Pixel* pixels;
+    unsigned long width;
+    unsigned long height;
+};
+
 class ImageScroller : public ThreadedCanvasManipulator {
 public:
     // Scroll image with "scroll_jumps" pixels every "scroll_ms" milliseconds.

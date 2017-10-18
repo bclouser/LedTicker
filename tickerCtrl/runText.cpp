@@ -11,7 +11,8 @@
 volatile bool interrupt_received = false;
 
 namespace ImageGen{
-    void doImage();
+    Image createImage();
+    void printPretty(Image& img);
 }
 
 static void InterruptHandler(int signo) {
@@ -135,7 +136,9 @@ int main(int argc, char *argv[]) {
     msgHandler.start();
 
     // Move this around probably
-    ImageGen::doImage();
+    Image testImage = ImageGen::createImage();
+
+    ImageGen::printPretty(testImage);
 
     // Now, the image generation runs in the background. We can do arbitrary
     // things here in parallel. In this demo, we're essentially just
