@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include "graphics.h"
 #include "ImageScroller.h"
@@ -7,7 +8,7 @@
 
 
 namespace ImageGen{
-	Image createImage(){
+	ImageScroller::Image createImage(){
 		std::string testString("Ben Says Hello");
 		rgb_matrix::Font font;
 
@@ -24,6 +25,7 @@ namespace ImageGen{
 		textColor.blue = 128;
 		unsigned numBitsPerRow = (sizeof(rowbitmap_t)*8);
 
+		printf("Number of bits per row = %d\n", numBitsPerRow);
 		// Obviously make these dynamic
 		int numRows = 20;
 		int currentWidth = 0;
@@ -32,7 +34,6 @@ namespace ImageGen{
 		Pixel *pixels = new Pixel [ pixelCount ];
 
 		// calculate the size of our image
-		//std::vector<const rgb_matrix::Glyph*> glyphs;
 		std::string::iterator it = testString.begin();
 		while (it != testString.end()) {
 		 	const uint32_t codepoint = utf8_next_codepoint(it);
@@ -51,16 +52,18 @@ namespace ImageGen{
 				if(glyph->bitmap[row]){
 					std::cout << "Ok so there is something at row: " << row << std::endl;
 					for(int column = 0; column < glyph->width; ++column){
-						if(glyph->bitmap[row] & (rowbitmap_t)(1<<(numBitsPerRow)-column)){
-							std::cout << "setting pixel for (" << row << "," << column << ")" << std::endl;
-							pixels[currentWidth*row + column].red = textColor.red;
-							pixels[currentWidth*row + column].green = textColor.green;
-							pixels[currentWidth*row + column].blue = textColor.blue;
+						rowbitmap_t columnMask = (rowbitmap_t)1ull<<(numBitsPerRow-column-1);
+						printf("trying mask of 0x%llX\n", columnMask);
+						if( (rowbitmap_t)glyph->bitmap[row] & columnMask){
+							std::cout << "setting pixel for (" << row << "," << column << "). Pixels index: " << std::to_string((currentWidth*row) + column) << std::endl;
+							pixels[(currentWidth*row) + column].red = textColor.red;
+							pixels[(currentWidth*row) + column].green = textColor.green;
+							pixels[(currentWidth*row) + column].blue = textColor.blue;
 						}
 						else{
-							pixels[currentWidth*row + column].red = 0x00;
-							pixels[currentWidth*row + column].green = 0x00;
-							pixels[currentWidth*row + column].blue = 0x00;
+							pixels[(currentWidth*row) + column].red = 0x00;
+							pixels[(currentWidth*row) + column].green = 0x00;
+							pixels[(currentWidth*row) + column].blue = 0x00;
 						}
 					}
 				}
@@ -69,28 +72,34 @@ namespace ImageGen{
 			currentWidth += glyph->width;
 
 			//glyphs.push_back(glyph);
-			std::cout << "glyph height: " << glyph->height << " glyph width: " << glyph->width <<std::endl;
+			//std::cout << "glyph height: " << glyph->height << " glyph width: " << glyph->width <<std::endl;
+			std::cout << "Current Width =  " << currentWidth << std::endl;
 		}
-		Image img;
-		img.pixels=pixels;
+		ImageScroller::Image img;
+		img.image=pixels;
 		img.width=currentWidth;
 		img.height=numRows;
+		// Shallow copy ok, we allocated memory for pixels above
 		return img;
 	}
 
 
-	void printPretty(Image& img){
+	void printPretty(ImageScroller::Image& img){
+		std::cout << "== Printing Pretty ==" << std::endl;
 		std::cout << "Image Height: " << img.height << "\n";
 		std::cout << "Image Width: " << img.width << "\n";
 		for(int row = 0; row < img.height; ++row){
-			std::cout << row << " |";
+			std::cout << std::setfill('0') << std::setw(2) << row << " |";
 			for(int column=0; column < img.width; ++column){
 				int currentIndex = row*img.width + column;
-				std::cout <<img.pixels[currentIndex].red  << img.pixels[currentIndex].green  << img.pixels[currentIndex].blue << "|";
+				if(img.image[currentIndex].red || img.image[currentIndex].green || img.image[currentIndex].blue){
+					std::cout <<"*"<< "|";
+				}else{
+					std::cout << " " << "|";
+				}
 			}
 			std::cout <<"\n";
 		}
-		std::cout << "|" <<std::endl;
 	}
 }
 

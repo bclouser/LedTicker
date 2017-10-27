@@ -18,13 +18,6 @@ struct Pixel {
     uint8_t blue;
 };
 
-struct Image{
-    Image():pixels(NULL), width(0), height(0){}
-    Pixel* pixels;
-    unsigned long width;
-    unsigned long height;
-};
-
 class ImageScroller : public ThreadedCanvasManipulator {
 public:
     // Scroll image with "scroll_jumps" pixels every "scroll_ms" milliseconds.
@@ -42,14 +35,6 @@ public:
         WaitStopped();   // only now it is safe to delete our instance variables.
     }
 
-    bool LoadPPM(const char *filename);
-    bool reLoadPPM(){
-        return LoadPPM(m_fileName);
-    }
-    void Run();
-
-    private:
-
     struct Image {
         Image() : width(-1), height(-1), image(NULL) {}
         ~Image() { Delete(); }
@@ -66,6 +51,17 @@ public:
         int height;
         Pixel *image;
     };
+    
+    bool LoadPPM(const char *filename);
+    bool reLoadPPM(){
+        return LoadPPM(m_fileName);
+    }
+    bool UpdateImage(ImageScroller::Image& newImage);
+    void Run();
+
+
+    private:
+
 
     // Read line, skip comments.
     char *ReadLine(FILE *f, char *buffer, size_t len);

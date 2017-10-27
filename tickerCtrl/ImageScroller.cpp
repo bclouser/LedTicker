@@ -74,6 +74,15 @@ bool ImageScroller::LoadPPM(const char *filename) {
     return true;
 }
 
+bool ImageScroller::UpdateImage(ImageScroller::Image& newImage){
+    MutexLock l(&mutex_new_image_);
+    new_image_.Delete();  // in case we reload faster than is picked up
+    new_image_.image = newImage.image;
+    new_image_.height = newImage.height;
+    new_image_.width = newImage.width;
+    return true;
+}
+
 
 void ImageScroller::Run() {
     bool imageOffScreen = true;

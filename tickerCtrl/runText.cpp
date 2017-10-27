@@ -11,8 +11,8 @@
 volatile bool interrupt_received = false;
 
 namespace ImageGen{
-    Image createImage();
-    void printPretty(Image& img);
+    ImageScroller::Image createImage();
+    void printPretty(ImageScroller::Image& img);
 }
 
 static void InterruptHandler(int signo) {
@@ -130,15 +130,20 @@ int main(int argc, char *argv[]) {
     signal(SIGTERM, InterruptHandler);
     signal(SIGINT, InterruptHandler);
 
-    // Image generating demo is crated. Now start the thread.
+    // Image generating demo is created. Now start the thread.
     imageScroller.Start();
     MessageHandler msgHandler(imageScroller);
     msgHandler.start();
 
     // Move this around probably
-    Image testImage = ImageGen::createImage();
+    ImageScroller::Image testImage = ImageGen::createImage();
 
     ImageGen::printPretty(testImage);
+
+
+    if(!imageScroller.UpdateImage(testImage)){
+        printf("Failed to update the image onto LED screen\n");
+    }
 
     // Now, the image generation runs in the background. We can do arbitrary
     // things here in parallel. In this demo, we're essentially just
