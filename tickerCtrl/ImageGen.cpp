@@ -16,6 +16,7 @@ namespace ImageGen{
 			std::cout << "Failed to load font" << std::endl;
 		}
 
+		int numPixPerRow = testString.length() * 10;
 		int pixelCount = testString.length() * 10 * 20;
 
 		// Color of specified text. Obviously make this dynamic later
@@ -36,8 +37,8 @@ namespace ImageGen{
 		// calculate the size of our image
 		std::string::iterator it = testString.begin();
 		while (it != testString.end()) {
+			// Codepoint is utf thing. Basically think of it like a character
 		 	const uint32_t codepoint = utf8_next_codepoint(it);
-		 	std::cout << "CodePoint = " << codepoint << std::endl;
 			const rgb_matrix::Glyph* glyph = font.FindGlyph(codepoint);
 			if(glyph == NULL){
 				std::cout << "glyph null for char: " << *it << std::endl;
@@ -50,20 +51,20 @@ namespace ImageGen{
 			for(int row = 0; row < numRows; ++row){
 				printf("bitmap[%d]: = 0x%llX\n", row, glyph->bitmap[row] );
 				if(glyph->bitmap[row]){
-					std::cout << "Ok so there is something at row: " << row << std::endl;
 					for(int column = 0; column < glyph->width; ++column){
+						// Offset of each row in the whole image plus this char's index and finally column offset
+						unsigned long currentIndex = numPixPerRow*row + currentWidth + column;
 						rowbitmap_t columnMask = (rowbitmap_t)1ull<<(numBitsPerRow-column-1);
-						printf("trying mask of 0x%llX\n", columnMask);
 						if( (rowbitmap_t)glyph->bitmap[row] & columnMask){
-							std::cout << "setting pixel for (" << row << "," << column << "). Pixels index: " << std::to_string((currentWidth*row) + column) << std::endl;
-							pixels[(currentWidth*row) + column].red = textColor.red;
-							pixels[(currentWidth*row) + column].green = textColor.green;
-							pixels[(currentWidth*row) + column].blue = textColor.blue;
+							std::cout << "setting pixel for (" << row << "," << column << "). Pixels index: " << currentIndex << std::endl;
+							pixels[currentIndex].red = textColor.red;
+							pixels[currentIndex].green = textColor.green;
+							pixels[currentIndex].blue = textColor.blue;
 						}
 						else{
-							pixels[(currentWidth*row) + column].red = 0x00;
-							pixels[(currentWidth*row) + column].green = 0x00;
-							pixels[(currentWidth*row) + column].blue = 0x00;
+							pixels[currentIndex].red = 0x00;
+							pixels[currentIndex].green = 0x00;
+							pixels[currentIndex].blue = 0x00;
 						}
 					}
 				}
