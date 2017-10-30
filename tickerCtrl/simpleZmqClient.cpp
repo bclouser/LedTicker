@@ -14,10 +14,11 @@ int main ()
     zmq::socket_t socket (context, ZMQ_REQ);
 
     std::cout << "Connecting to hello world server…" << std::endl;
-    socket.connect ("tcp://192.168.1.29:5555");
+    socket.connect ("tcp://192.168.1.38:5555");
 
-    zmq::message_t request(14);
-    memcpy (request.data(), "{\"command\":12}", 14);
+    zmq::message_t request(255);
+    std::string cmdString("{\"command\":12, \"string\":\"Ben says this is coming from a test app\"}");
+    memcpy (request.data(), cmdString.c_str(), cmdString.length());
     std::cout << "Sending Hello " << std::endl;
     socket.send (request);
 

@@ -37,10 +37,11 @@
             std::cout << jsonMsg.get("command", -1).asString() << std::endl;
 
             int command = jsonMsg.get("command", -1).asInt();
+            std::string newText = jsonMsg.get("string", -1).asString();
 	        zmq::message_t reply (12);
             if(command == 12){
 		        // Load new image
-		        if(!msgHandler->m_imgScroller.reLoadPPM()){
+		        if(!msgHandler->m_imgScroller.UpdateImage(newText.c_str())){
 		        	std::cout << "failed to load new image" << std::endl;
 		        	memcpy (reply.data(), "Failed", 6);
 		        }

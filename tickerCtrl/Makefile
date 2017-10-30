@@ -1,7 +1,7 @@
 #CFLAGS=-Wall -O3 -g
 CFLAGS=-Wall -Wextra -O3 -g -Ilibzmq/include -Ijsoncpp/include
 CXXFLAGS=$(CFLAGS) -std=c++11
-OBJECTS=ImageScroller.o runText.o MessageHandler.o ImageGen.o
+OBJECTS=ImageScroller.o runText.o MessageHandler.o
 BINARIES=runText
 
 # Where our library resides. You mostly only need to change the

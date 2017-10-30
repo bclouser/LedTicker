@@ -119,10 +119,12 @@ int main(int argc, char *argv[]) {
 
     ImageScroller imageScroller(matrix, scroll_jumps, scroll_ms);
 
+    /*
     if (!imageScroller.LoadPPM(imageFilePath)){
         printf("Failed to load image. is it a valid ppm image?\n");
         return 1;
     }
+    */
 
     // Set up an interrupt handler to be able to stop animations while they go
     // on. Note, each demo tests for while (running() && !interrupt_received) {},
@@ -136,13 +138,8 @@ int main(int argc, char *argv[]) {
     msgHandler.start();
 
     // Move this around probably
-    ImageScroller::Image testImage = ImageGen::createImage();
-
-    ImageGen::printPretty(testImage);
-
-
-    if(!imageScroller.UpdateImage(testImage)){
-        printf("Failed to update the image onto LED screen\n");
+    if( !imageScroller.UpdateImage("Ben says hello. Original image") ){
+        printf("Failed to update the image onto LED screen \n");
     }
 
     // Now, the image generation runs in the background. We can do arbitrary
