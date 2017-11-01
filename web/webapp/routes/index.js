@@ -7,6 +7,7 @@ router.get('/', function(req, res, next) {
 });
 
 /* GET Userlist page. */
+/*
 router.get('/userlist', function(req, res) {
     var db = req.db;
     var collection = db.get('usercollection');
@@ -16,39 +17,65 @@ router.get('/userlist', function(req, res) {
         });
     });
 });
+*/
 
-/* GET New User page. */
-router.get('/newuser', function(req, res) {
-    res.render('newuser', { title: 'Add New User' });
+router.get('/tickerData', function(req, res) {
+    var db = req.db;
+    var collection = db.get('tickerData');
+    collection.find({},{},function(e,docs){
+        res.render('tickerData', docs);
+    });
 });
 
 /* POST to Add User Service */
-router.post('/adduser', function(req, res) {
+router.post('/ticker', function(req, res) {
 
     // Set our internal DB variable
     var db = req.db;
 
-    // Get our form values. These rely on the "name" attributes
-    var userName = req.body.username;
-    var userEmail = req.body.useremail;
+    // Get our form values. These rely on the "name" attributes in html form
+    var dailyProcessed = parseFloat(req.body.dailyProcessed);
+    var monthlyProcessed = parseFloat(req.body.monthlyProcessed);
+    var railsInField = parseInt(req.body.railsInField);
+    var numRestaurants = parseInt(req.body.numRestaurants);
+
+    console.log("dailyProcessed " + typeof dailyProcessed);
+    console.log("monthlyProcessed " + typeof monthlyProcessed);
+    console.log("railsInField " + typeof railsInField);
+    console.log("numRestaurants " + typeof numRestaurants);
+
+
+    // TODO error checking and check against empty
 
     // Set our collection
-    var collection = db.get('usercollection');
+    var collection = db.get('tickerData');
 
+    console.log("Updating the database");
     // Submit to the DB
-    collection.insert({
-        "username" : userName,
-        "email" : userEmail
-    }, function (err, doc) {
-        if (err) {
-            // If it failed, return error
-            res.send("There was a problem adding the information to the database.");
+    collection.update(
+        {"name" : "tablesafe"},
+        {
+        "name" : "tablesafe",
+        "dailyProcessed" : dailyProcessed,
+        "monthlyProcessed" : monthlyProcessed,
+        "railsInField" : railsInField,
+        "numRestaurants" : numRestaurants
+        },
+        {"upsert":true},
+        function (err, doc) {
+            if (err) {
+                console.log("Ok, so there was an error updating the tickerData in the db");
+                // If it failed, return error
+                //res.send("There was a problem adding the latest ticker data to the database.");
+                res.redirect('error',err.stack);
+            }
+            else {
+                console.log("Looks like the db update worked")
+                // And forward to success page
+                res.redirect('/');
+            }
         }
-        else {
-            // And forward to success page
-            res.redirect("userlist");
-        }
-    });
+    );
 });
 
 module.exports = router;

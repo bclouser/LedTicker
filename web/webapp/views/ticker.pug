@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    h1= Ticker
+    form#formUpdateString(name="updatestring",method="post",action="/tickerstring")
+    	p Number of Transactions
+        input#inputUserName(type="text", placeholder="0", name="tickerString")
+        p Number of Rails
+        input#inputUserName(type="text", placeholder="Ben is a God", name="tickerString")
+        button#btnSubmit(type="submit") submit

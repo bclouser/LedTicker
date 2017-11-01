@@ -1,0 +1,23 @@
+extend layout
+
+block content
+  .main.container
+    .row
+      .col-md-6.col-md-offset-3
+        h1.display-4.m-b-2 Tablesafe Ticker
+
+        // register form
+        form(method='POST' action='/ticker')
+          div.form-group
+            label(for='name') Money Processed Yesterday:
+            input#name.form-control(type='number', min="1", step="any", placeholder='$0.00' name='dailyProcessed')
+          div.form-group
+            label(for='name') Money Processed Last Month:
+            input#name.form-control(type='number', min="1", step="any", placeholder='$0.00' name='monthlyProcessed')
+          div.form-group
+            label(for='email') Number of Rails in Field:
+            input#email.form-control(type='number', placeholder='0', name='railsInField')
+          div.form-group
+            label(for='pw') Number of Restaurants:
+            input#pw.form-control(type='number', placeholder='0' name='numRestaurants')
+          button.btn.btn-primary(type='submit') Update
