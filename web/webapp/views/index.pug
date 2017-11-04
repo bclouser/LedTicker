@@ -1,5 +1,9 @@
 extend layout
 
+block scripts
+  script(src='javascripts/ticker.js')
+
+
 block content
   .main.container
     .row
@@ -9,15 +13,19 @@ block content
         // register form
         form(method='POST' action='/ticker')
           div.form-group
-            label(for='name') Money Processed Yesterday:
-            input#name.form-control(type='number', min="1", step="any", placeholder='$0.00' name='dailyProcessed')
+            label(for='dailyProcessed') Money Processed Yesterday:
+            input#dailyProcessed.form-control(type='number', min="1", step="any", placeholder='$0.00' name='dailyProcessed')
           div.form-group
-            label(for='name') Money Processed Last Month:
-            input#name.form-control(type='number', min="1", step="any", placeholder='$0.00' name='monthlyProcessed')
+            label(for='monthlyProcessed') Money Processed Last Month:
+            input#monthlyProcessed.form-control(type='number', min="1", step="any", placeholder='$0.00' name='monthlyProcessed')
           div.form-group
-            label(for='email') Number of Rails in Field:
-            input#email.form-control(type='number', placeholder='0', name='railsInField')
+            label(for='totalProcessed') Total Money Processed:
+            input#totalProcessed.form-control(type='number', min="1", step="any", placeholder='$0.00' name='totalProcessed')
           div.form-group
-            label(for='pw') Number of Restaurants:
-            input#pw.form-control(type='number', placeholder='0' name='numRestaurants')
+            label(for='railsInField') Number of Rails in Field:
+            input#railsInField.form-control(type='number', placeholder='0', name='railsInField')
+          div.form-group
+            label(for='numRestaurants') Number of Restaurants:
+            input#numRestaurants.form-control(type='number', placeholder='0' name='numRestaurants')
           button.btn.btn-primary(type='submit') Update
+
