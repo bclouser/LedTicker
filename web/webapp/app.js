@@ -9,7 +9,7 @@ var index = require('./routes/index');
 var mongo = require('mongodb');
 var monk = require('monk');
 var db = monk('localhost:27017/ledTicker');
-var io = require('socket.io')(6000);
+//var io = require('socket.io')(6000);
 
 var app = express();
 
@@ -51,45 +51,6 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   console.log(err.stack);
   res.render('error');
-});
-
-// When we get a connection from socket.io
-io.on('connection', function(socket){
-	console.log('Somebody connected');
-	socket.on('scrollAlert', function(msg){
-		console.log("Ticker message has been scrolled off the screen");
-		console.log(msg);
-
-		// Validate parameters
-
-
-		// Has the ticker data been updated since last update?
-		if(TickerMessageChanged){
-			// Kill process?
-			// Create new image
-			console.log("launching child process");
-			const { spawn } = require('child_process');
-			const createImageScript = spawn('/Users/bclouser/workspace/ledTicker/createImage/createImages.sh');
-
-			createImageScript.stdout.on('data', (data) => {
-				console.log(`stdout: ${data}`);
-			});
-			createImageScript.stderr.on('data', (data) => {
-				console.log(`stderr: ${data}`);
-			});
-			createImageScript.on('close', (code) => {
-				console.log(`child process exited with code ${code}`);
-				if(code != 0){
-					console.log("Failed to create image")
-					return;
-				}
-
-				// Re-Launch ticker app
-				// 
-				const tickerApp = spawn('/Users/bclouser/workspace/ledTicker/createImage/createImages.sh');
-			});
-		}
-	});
 });
 
 

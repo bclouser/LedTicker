@@ -1,7 +1,7 @@
 #CFLAGS=-Wall -O3 -g
-CFLAGS=-Wall -Wextra -O3 -g -Ilibzmq/include -Ijsoncpp/include
+CFLAGS=-Wall -Wextra -O3 -g -Ilibzmq/include
 CXXFLAGS=$(CFLAGS) -std=c++11
-OBJECTS=ImageScroller.o runText.o MessageHandler.o
+OBJECTS=ImageScroller.o runText.o MessageHandler.o ImageGen.o
 BINARIES=runText
 
 # Where our library resides. You mostly only need to change the
@@ -17,20 +17,10 @@ ZMQ_REPO_DIR=libzmq
 ZMQ_LIB_DIR=libzmq/src/.libs
 ZMQ_LIB=$(ZMQ_LIB_DIR)/lib$(ZMQ_LIB_NAME).a
 
-JSON_LIB_NAME=jsoncpp
-JSON_REPO_DIR=jsoncpp
-JSON_LIB_DIR=$(JSON_REPO_DIR)/build/src/lib_json
-JSON_LIB= $(JSON_LIB_DIR)/libjsoncpp.a
-
 # TODO, we really can't be statically linking zmq, its huge!!!
-LDFLAGS+=-L$(RGB_LIBDIR) -l$(RGB_LIB_NAME) -L$(ZMQ_LIB_DIR) -l:libzmq.a -L$(JSON_LIB_DIR) -l$(JSON_LIB_NAME) -lrt -lm -lpthread
+LDFLAGS+=-L$(RGB_LIBDIR) -l$(RGB_LIB_NAME) -L$(ZMQ_LIB_DIR) -l:libzmq.a -lrt -lm -lpthread
 
 all : $(BINARIES)
-$(JSON_LIB):
-	cd $(JSON_REPO_DIR) && mkdir -p build
-	cd $(JSON_REPO_DIR)/build && cmake -DCMAKE_TOOLCHAIN_FILE=../../rpiToolchainFile.cmake ..
-	# Get out of here unit tests! IDGAF
-	$(MAKE) -C $(JSON_REPO_DIR)/build jsoncpp_lib_static
 
 $(ZMQ_LIB):
 	cd $(ZMQ_REPO_DIR) && ./autogen.sh
@@ -40,7 +30,7 @@ $(ZMQ_LIB):
 $(RGB_LIB): FORCE
 	$(MAKE) -C $(RGB_LIBDIR)
 
-$(BINARIES): $(OBJECTS) $(RGB_LIB) $(ZMQ_LIB) $(JSON_LIB)
+$(BINARIES): $(OBJECTS) $(RGB_LIB) $(ZMQ_LIB)
 	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
 
 %.o : %.cpp

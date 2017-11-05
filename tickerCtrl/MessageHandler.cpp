@@ -1,59 +1,52 @@
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <unistd.h>
 #include <thread>
 #include "MessageHandler.h"
 #include "cppzmq/zmq.hpp"
-#include "json/json.h"
+#include "ImageGen.h"
 
 	static void messsagingThread(MessageHandler* msgHandler) {
 	    //  Prepare our context and socket
 	    zmq::context_t context (1);
-	    zmq::socket_t socket (context, ZMQ_REP);
-	    socket.bind ("tcp://*:5555");
+	    zmq::socket_t subscriber (context, ZMQ_SUB);
+	    subscriber.connect("tcp://127.0.0.1:5556");
+	    const char* tickerFilter = "tickerData";
+	    subscriber.setsockopt(ZMQ_SUBSCRIBE, tickerFilter, 10);
+
+	    ImageGen imgGen; // Potentially don't need to even have a class that requires instance if it doesn't have state.
+	    ImageScroller::Image img; // Potentially bad scope of this image... if this thread dies :(
 
 	    while (!msgHandler->m_killThread) {
 	        zmq::message_t msg;
 
 	        //  Wait for next msg from client
-	        if(!socket.recv(&msg)){
+	        if(!subscriber.recv(&msg)){
 	        	std::cout << "Something bad happened while waiting for message" << std::endl;
 	        }
 
-	        std::cout << "Got message of size: " << msg.size() << std::endl;
-	        std::string buf((char*)msg.data(), msg.size());
+	        //std::istringstream iss(static_cast<char*>(msg.data()));
+	        std::string filter((char*)msg.data(), msg.size());
 
-	        std::cout << "Received: "<< buf << std::endl;
-	        //std::cout << "Received Hello" << std::endl;
+	        if(filter == tickerFilter){
+	        	//  pull out the data from subscription
+	        	if(!subscriber.recv(&msg)){
+	        		std::cout << "Something bad happened while pulling out data" << std::endl;
+	        	}
 
-	        Json::Value jsonMsg;
-            Json::Reader reader;
-            bool parsingSuccessful = reader.parse(buf.c_str(), jsonMsg);
-            if (!parsingSuccessful)
-            {
-                std::cout  << "Bad json message received. Parser Error: "
-                       << reader.getFormattedErrorMessages();
-            }
-            std::cout << jsonMsg.get("command", -1).asString() << std::endl;
-
-            int command = jsonMsg.get("command", -1).asInt();
-            std::string newText = jsonMsg.get("string", -1).asString();
-	        zmq::message_t reply (12);
-            if(command == 12){
-		        // Load new image
-		        if(!msgHandler->m_imgScroller.UpdateImage(newText.c_str())){
-		        	std::cout << "failed to load new image" << std::endl;
-		        	memcpy (reply.data(), "Failed", 6);
+	        	std::string buf(static_cast<char*>(msg.data()), msg.size());
+	        	//std::cout << "size buf = " << msg.size() << " Received: "<< buf << std::endl;
+		
+		        if(!imgGen.createImageFromEncodedString(buf, img)){
+		        	std::cout << "Failed to create the image from encoded string" << std::endl;
 		        }
-		        else{
-		        	memcpy (reply.data(), "Succeeded", 9);
+
+		        if(!msgHandler->m_imgScroller.UpdateImage(img)){
+		        	std::cout << "Failed to update image into the image scroller" << std::endl;
 		        }
-            }
-            else{
-            	std::cout << "Unrecognized command: " << command << std::endl;
-    		}
-	        //  Send reply back to client
-	        socket.send(reply);
+		    	//msgHandler->m_imgScroller.printImage(img);
+	        }
 	    }
 	}
 

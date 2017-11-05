@@ -4,16 +4,12 @@
 
 #include "ImageScroller.h"
 #include "MessageHandler.h"
+#include "ImageGen.h"
 
 #define TERM_ERR  "\033[1;31m"
 #define TERM_NORM "\033[0m"
 
 volatile bool interrupt_received = false;
-
-namespace ImageGen{
-    ImageScroller::Image createImage();
-    void printPretty(ImageScroller::Image& img);
-}
 
 static void InterruptHandler(int signo) {
     interrupt_received = true;
@@ -137,8 +133,14 @@ int main(int argc, char *argv[]) {
     MessageHandler msgHandler(imageScroller);
     msgHandler.start();
 
+    ImageGen imgGen;
+    ImageScroller::Image img;
+    std::string defaultStr("Ben says this is the default image");
     // Move this around probably
-    if( !imageScroller.UpdateImage("Ben says hello. Original image") ){
+    if(!imgGen.createImageFromEncodedString(defaultStr, img)){
+        printf("Failed to create default image for the led screen\n");
+    }
+    if( !imageScroller.UpdateImage(img) ){
         printf("Failed to update the image onto LED screen \n");
     }
 

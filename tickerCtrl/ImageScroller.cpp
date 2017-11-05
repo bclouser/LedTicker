@@ -17,7 +17,6 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
-#include "rpi-rgb-led-matrix/lib/utf8-internal.h"
 
 using std::min;
 using std::max;
@@ -76,77 +75,6 @@ bool ImageScroller::LoadPPM(const char *filename) {
     return true;
 }
 
-bool ImageScroller::UpdateImage(const char* inString){
-    std::string testString(inString);
-    rgb_matrix::Font font;
-    Image& img = *(new Image());
-
-    if(!font.LoadFont("./fonts/9x15.bdf")){
-        std::cout << "Failed to load font" << std::endl;
-    }
-
-    // 9 because 9x15
-    int numPixPerRow = testString.length() * 9;
-    int pixelCount = testString.length() * 9 * font.height();
-
-    // Color of specified text. Obviously make this dynamic later
-    Pixel textColor;
-    textColor.red = 150;
-    textColor.green = 128;
-    textColor.blue = 0;
-    unsigned numBitsPerRow = (sizeof(rowbitmap_t)*8);
-    // Obviously make these dynamic
-    int numRows = 15;
-    int currentWidth = 0;
-
-    // create the whole container
-    Pixel *pixels = new Pixel [ pixelCount ];
-
-    // calculate the size of our image
-    std::string::iterator it = testString.begin();
-    while (it != testString.end()) {
-        // Codepoint is utf thing. Basically think of it like a character
-        const uint32_t codepoint = utf8_next_codepoint(it);
-        const rgb_matrix::Glyph* glyph = font.FindGlyph(codepoint);
-        if(glyph == NULL){
-            std::cout << "glyph null for char: " << *it << std::endl;
-            continue; 
-        }
-        if(glyph->height != numRows){
-            std::cout << "Warning: Glyph mismatch. glyph height = " << glyph->height << "image height = " << numRows <<std::endl;
-        }
-        for(int row = 0; row < numRows; ++row){
-            if(glyph->bitmap[row]){
-                for(int column = 0; column < glyph->width; ++column){
-                    // Offset of each row in the whole image plus this char's index and finally column offset
-                    unsigned long currentIndex = numPixPerRow*row + currentWidth + column;
-                    rowbitmap_t columnMask = (rowbitmap_t)1ull<<(numBitsPerRow-column-1);
-                    if( (rowbitmap_t)glyph->bitmap[row] & columnMask){
-                        pixels[currentIndex].red = textColor.red;
-                        pixels[currentIndex].green = textColor.green;
-                        pixels[currentIndex].blue = textColor.blue;
-                    }
-                    else{
-                        pixels[currentIndex].red = 0x00;
-                        pixels[currentIndex].green = 0x00;
-                        pixels[currentIndex].blue = 0x00;
-                    }
-                }
-            }
-        }
-
-        currentWidth += glyph->width;
-
-        //glyphs.push_back(glyph);
-        //std::cout << "glyph height: " << glyph->height << " glyph width: " << glyph->width <<std::endl;
-        //std::cout << "Current Width =  " << currentWidth << std::endl;
-    }
-    img.image=pixels;
-    img.width=currentWidth;
-    img.height=numRows;
-    return UpdateImage(img);
-}
-
 void ImageScroller::printImage(ImageScroller::Image& img){
     std::cout << "== Printing Pretty ==" << std::endl;
     std::cout << "Image Height: " << img.height << "\n";
@@ -189,6 +117,7 @@ bool ImageScroller::UpdateImage(ImageScroller::Image& newImage){
     new_image_.image = newImage.image;
     new_image_.height = newImage.height;
     new_image_.width = newImage.width;
+    std::cout<< "Image height " << new_image_.height << " width " << new_image_.width << std::endl;
     return true;
 }
 

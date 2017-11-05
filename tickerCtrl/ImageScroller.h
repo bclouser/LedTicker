@@ -57,7 +57,6 @@ public:
         return LoadPPM(m_fileName);
     }
     bool UpdateImage(ImageScroller::Image& newImage);
-    bool UpdateImage(const char* inString);
     void printImage(ImageScroller::Image& img);
     void printImage();
     void Run();

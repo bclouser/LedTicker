@@ -4,8 +4,8 @@ var bodyParser = require('body-parser');
 var zmq = require('zeromq')
 var sock = zmq.socket('pub');
 // pubber.js
-sock.bindSync("tcp://*:3001");
-console.log('Publisher bound to port 3001');
+sock.bindSync("tcp://*:5556");
+console.log('Publisher bound to port 5556');
 
 // create application/json parser
 var jsonParser = bodyParser.json()
@@ -125,7 +125,7 @@ router.post('/ticker', function(req, res) {
         lastMonthName = monthName[lastMonth.getMonth()];
         var beerPoured = 0;
 
-        var tickerString = "&c00FF00&eMONY&eMONY&eMONY&eMONY Yesterday("+yesterdayName+"): $"+dailyProcessed.toFixed(2) +", "+lastMonthName+": "+monthlyProcessed.toFixed(2)+", Money To-Date: "+totalProcessed.toFixed(2)+", &c0000FFRestaurants: "+numRestaurants+", Deployed Rails: "+railsInField+", &cFFFFFF&eBEER&eBEER&eBEER&eBEER&eBEER&eBEER Beer Poured: "+beerPoured+" gallons. &eBENC Slip me some &eRANR&eRANR&eRANR&eRANR!!!";
+        var tickerString = "&c10B020&eMONY&eMONY&eMONY&eMONY Yesterday("+yesterdayName+"): $"+dailyProcessed.toFixed(2) +", In "+lastMonthName+": "+monthlyProcessed.toFixed(2)+", To Date: "+totalProcessed.toFixed(2)+", &c0000FFRestaurants: "+numRestaurants+", Deployed Rails: "+railsInField+", &cFFFFFF&eBEER&eBEER&eBEER&eBEER&eBEER&eBEER Keg Poured: "+beerPoured+" gallons. &cB01100&eBENC Slip me some &eRANR&eRANR&eRANR&eRANR!!!";
         console.log("TICKERSTRING: " + tickerString);
         console.log("publishing message out to the ticker");
         publishToTicker(tickerString);
