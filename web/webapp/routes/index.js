@@ -107,13 +107,13 @@ router.post('/ticker', function(req, res) {
         monthName[11] = "December";
 
         var dayOfWeek = new Array();
-        dayOfWeek[0] = "Sunday";
-        dayOfWeek[1] = "Monday";
-        dayOfWeek[2] = "Tuesday";
-        dayOfWeek[3] = "Wednesday";
-        dayOfWeek[4] = "Thursday";
-        dayOfWeek[5] = "Friday";
-        dayOfWeek[6] = "Saturday";
+        dayOfWeek[0] = "Sun";
+        dayOfWeek[1] = "Mon";
+        dayOfWeek[2] = "Tues";
+        dayOfWeek[3] = "Wed";
+        dayOfWeek[4] = "Thurs";
+        dayOfWeek[5] = "Fri";
+        dayOfWeek[6] = "Sat";
         
         var date = new Date();
         console.log()
@@ -125,7 +125,7 @@ router.post('/ticker', function(req, res) {
         lastMonthName = monthName[lastMonth.getMonth()];
         var beerPoured = 0;
 
-        var tickerString = "&c10B020&eMONY&eMONY&eMONY&eMONY Yesterday("+yesterdayName+"): $"+dailyProcessed.toFixed(2) +", In "+lastMonthName+": "+monthlyProcessed.toFixed(2)+", To Date: "+totalProcessed.toFixed(2)+", &c0000FFRestaurants: "+numRestaurants+", Deployed Rails: "+railsInField+", &cFFFFFF&eBEER&eBEER&eBEER&eBEER&eBEER&eBEER Keg Poured: "+beerPoured+" gallons. &cB01100&eBENC Slip me some &eRANR&eRANR&eRANR&eRANR!!!";
+        var tickerString = "&c14552F&eMONY&eMONY&eMONY&eMONY Yesterday("+yesterdayName+"): $"+dailyProcessed.toFixed(2) +", In "+lastMonthName+": $"+monthlyProcessed.toFixed(2)+", To Date: $"+totalProcessed.toFixed(2)+", &c14552FRestaurants: "+numRestaurants+", Deployed Rails: "+railsInField+", &cD2A9E3&eBEER&eBEER&eBEER&eBEER&eBEER&eBEER Keg Poured: "+beerPoured+" gallons. &c544704&eBENC Slip me some &eRANR&eRANR&eRANR&eRANR!!!";
         console.log("TICKERSTRING: " + tickerString);
         console.log("publishing message out to the ticker");
         publishToTicker(tickerString);

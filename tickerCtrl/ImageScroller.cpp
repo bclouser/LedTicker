@@ -152,7 +152,7 @@ void ImageScroller::Run() {
         //printf("current_image_.width = %d\n", current_image_.width);
         for (int x = 0; x < screen_width; ++x) {
             // Check for when we have completely scrolled the image off the screen.
-            if((horizontal_position_+x) == (current_image_.width)) {
+            if((horizontal_position_+x) == (current_image_.width + screen_width)) {
                 // reset horizontal_position
                 horizontal_position_ = (-screen_width);
                 imageOffScreen = true;
@@ -160,6 +160,10 @@ void ImageScroller::Run() {
             }
             for (int y = 0; y < screen_height; ++y) {
                 if(horizontal_position_+x < 0){
+                    offscreen_->SetPixel(x, y, 0, 0, 0);
+                }
+                // when we roll off the edge
+                else if (horizontal_position_+x > current_image_.width){
                     offscreen_->SetPixel(x, y, 0, 0, 0);
                 }
                 else{

@@ -1,0 +1,25 @@
+#75C12B green
+#34D2FA blue
+#842B31 auburn
+#845340 lighter auburn
+#26343F dark blue
+#71D8BA sea foam
+#6BDAED blue
+#FC5599 pink
+#F6515A pinkish red
+#370760 deep purple
+#406360 darkish greenish blue
+#544704 brown
+#B5A1A3 gray
+#F0B284 peach
+#F96E00 orange
+#14552F pinetree green
+#CEE8E6 white blue
+#DE9A24 yellowish
+#DDE746 yellow green
+#8B667C light purple
+#71625F flat gray
+#DCDA0A bright yellow
+#55512B dark brown
+#252E71 dark blue
+#D2A9E3 light purple
