@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
+var tickerApi = require('./routes/ticker');
 var mongo = require('mongodb');
 var monk = require('monk');
 var db = monk('localhost:27017/ledTicker');
@@ -33,6 +34,7 @@ app.use(function(req,res,next){
 });
 
 app.use('/', index);
+app.use('/ticker', tickerApi);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

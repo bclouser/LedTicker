@@ -11,7 +11,7 @@ block content
         h1.display-4.m-b-2 Tablesafe Ticker
 
         // register form
-        form(method='POST' action='/ticker')
+        form(method='POST' action='/ticker/update')
           div.form-group
             label(for='dailyProcessed') Money Processed Yesterday:
             input#dailyProcessed.form-control(type='number', min="1", step="any", placeholder='$0.00' name='dailyProcessed')
@@ -27,5 +27,8 @@ block content
           div.form-group
             label(for='numRestaurants') Number of Restaurants:
             input#numRestaurants.form-control(type='number', placeholder='0' name='numRestaurants')
+          div.form-group
+            label(for='announcement') Announcement:
+            input#announcement.form-control(type='text', placeholder='0' name='announcement')
           button.btn.btn-primary(type='submit') Update
 

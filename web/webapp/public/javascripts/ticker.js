@@ -1,5 +1,5 @@
 $(function() {
-	$.post( "/tickerData", {}, 
+	$.post( "/ticker/data", {}, 
 		function( data ) {
 			console.log("Got data back");
 			console.log(data);
@@ -18,6 +18,9 @@ $(function() {
 			}
 			if(data.hasOwnProperty("numRestaurants")){
 				$("div.form-group #numRestaurants").attr('placeholder', data.numRestaurants);
+			}
+			if(data.hasOwnProperty("announcement")){
+				$("div.form-group #announcement").attr('placeholder', data.announcement);
 			}		
 	});
 });
