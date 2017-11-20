@@ -6,7 +6,18 @@
 
 var app = require('../app');
 var debug = require('debug')('webapp:server');
-var http = require('http');
+var https = require('https');
+var fs = require('fs');
+
+var options = {
+  key: fs.readFileSync('certs/server.key'),
+  cert: fs.readFileSync('certs/server.crt'),
+};
+
+
+
+console.log("\nKey:\n"+options.key);
+console.log("Cert:\n"+options.cert + "\n");
 
 /**
  * Get port from environment and store in Express.
@@ -19,7 +30,7 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+var server = https.createServer(options, app);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -28,6 +39,8 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+console.log("Https server up and listening on port "+ port);
 
 /**
  * Normalize a port into a number, string, or false.

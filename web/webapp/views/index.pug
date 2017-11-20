@@ -1,6 +1,8 @@
 extend layout
 
 block scripts
+  link(rel='stylesheet', href='/jemoji/jemoji.min.css')
+  script(src='jemoji/jemoji.min.js')
   script(src='javascripts/ticker.js')
 
 
@@ -29,6 +31,9 @@ block content
             input#numRestaurants.form-control(type='number', placeholder='0' name='numRestaurants')
           div.form-group
             label(for='announcement') Announcement:
-            input#announcement.form-control(type='text', placeholder='0' name='announcement')
-          button.btn.btn-primary(type='submit') Update
+            div.input-group
+              input#announcement.form-control(type='text', placeholder='0' name='announcement')
+              span.input-group-btn
+                button#emoji-btn.btn.btn-default(type="button") :)
+          button.btn.btn-danger(type='submit') Update
 

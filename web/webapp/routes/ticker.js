@@ -36,7 +36,6 @@ function publishToTicker(tickerData){
     dayOfWeek[6] = "Sat";
     
     var date = new Date();
-    console.log()
     var yesterday = new Date();
     yesterday.setDate(date.getDate() - 1);
     var yesterdayName = dayOfWeek[yesterday.getDay()];
@@ -54,10 +53,10 @@ function publishToTicker(tickerData){
     // &c544704&eBENC Slip me some &eRANR&eRANR&eRANR&eRANR!!!
 
     var tickerString = "&c14552F&eMONY&eMONY&eMONY&eMONY Yesterday("+yesterdayName+"): $"+dailyProcessed.toFixed(2) +", In "+lastMonthName+": $"+monthlyProcessed.toFixed(2)+", To Date: $"+totalProcessed.toFixed(2)+", &c14552FRestaurants: "+numRestaurants+", Deployed Rails: "+railsInField+", &cD2A9E3&eBEER&eBEER&eBEER&eBEER&eBEER&eBEER Keg Poured: "+beerPoured+" gallons. "+announcement;
-    console.log("TICKERSTRING: " + tickerString);
-    console.log("publishing message out to the ticker");
+    console.log("TICKERSTRING: \n" + tickerString + "\n");
 
     sock.send(['tickerData', tickerString]);
+    console.log("published message to ticker");
 }
 
 function validateAndParseParam(key, value){
@@ -173,9 +172,14 @@ router.post('/update', function(req, res) {
             console.log(err.stack);
             res.rendor('error', err.stack);
         }
+        if(activeDoc == null){
+            console.log("Database doesn't contain any documents yet...");
+            activeDoc = {"name":"tablesafe"};
+            // This doesn't totally solve the issue.
+            // TODO: Actually handle things when our database is empty
+        }
 
         for(var key in req.body){
-            console.log(key);
             // We only care about the params they did pass in
             if(!req.body[key]){
                 continue;

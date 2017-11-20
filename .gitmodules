@@ -7,3 +7,6 @@
 [submodule "tickerCtrl/libzmq"]
 	path = tickerCtrl/libzmq
 	url = https://github.com/zeromq/libzmq.git
+[submodule "web/webapp/public/jemoji"]
+	path = web/webapp/public/jemoji
+	url = https://github.com/bclouser/jemoji.git

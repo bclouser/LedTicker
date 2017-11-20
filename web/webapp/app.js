@@ -9,7 +9,27 @@ var index = require('./routes/index');
 var tickerApi = require('./routes/ticker');
 var mongo = require('mongodb');
 var monk = require('monk');
-var db = monk('localhost:27017/ledTicker');
+var auth = require("basic-auth");
+var fs = require("fs");
+
+
+// Read Synchronously
+var passwdFile = fs.readFileSync("passwdFile.json");
+var passwd = JSON.parse(passwdFile);
+
+if((passwd.api.user === undefined)||(passwd.api.password === undefined) ||
+  (passwd.db.user === undefined)||(passwd.db.password === undefined)){
+  console.log("Bad password file");
+}
+
+console.log("Db user: " + passwd.db.user)
+console.log("Db password: " + passwd.db.password)
+var db = monk(''+passwd.db.user+':'+passwd.db.password+'@localhost:27017/ledTicker');
+
+// var db = monk('localhost:27017/ledTicker',{
+//   username : passwd.db.user,
+//   password : passwd.db.password
+// });
 //var io = require('socket.io')(6000);
 
 var app = express();
@@ -26,6 +46,23 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname + '/node_modules/bootstrap/dist'));
+
+
+admins = {}
+admins[passwd.api.user] = {"password": passwd.api.password};
+
+console.log("API user: " + passwd.api.user)
+console.log("API password: " + passwd.api.password)
+
+
+app.use(function(request, response, next) {
+  var user = auth(request);
+  if (!user || !admins[user.name] || admins[user.name].password !== user.pass) {
+    response.set('WWW-Authenticate', 'Basic realm="example"');
+    return response.status(401).send();
+  }
+  return next();
+});
 
 // Make our db accessible to our router
 app.use(function(req,res,next){

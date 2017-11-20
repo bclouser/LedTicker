@@ -1,0 +1,10 @@
+{
+	"api":{
+	"user":"someUser",
+	"password":"somePassword"
+	},
+	"db":{
+		"user":"someUser",
+		"password":"somePassword"
+	}
+}
