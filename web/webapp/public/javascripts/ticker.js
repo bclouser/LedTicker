@@ -25,11 +25,7 @@ $(function() {
 			}
 	});
 
-	$('#announcement').jemoji({	
-		icons:        ["beer", "book", "boom", "bug", "bulb", "cactus", "candy", "car", "cat", "checkered_flag", 
-						"cherries", "christmas_tree", "chocolate_bar", "cinema", "dog", "donut", "droplet", "fish",
-						"floppy_disk", "four_leaf_clover", "lemon", "loudspeaker", "money_with_wings", "ok_hand", 
-						"package", "pizza", "snail", "snake", "snowflake", "snowman", "star", "white-check-mark"],
+	$('#announcement').jemoji({
 		extension:    'png',
 		folder:       'jemoji/emojis/',
 		btn:    $('#emoji-btn'),
