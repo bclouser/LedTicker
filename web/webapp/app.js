@@ -11,6 +11,7 @@ var mongo = require('mongodb');
 var monk = require('monk');
 var auth = require("basic-auth");
 var fs = require("fs");
+var ticker = require("./tickerInterface.js");
 
 
 // Read Synchronously
@@ -91,6 +92,9 @@ app.use(function(err, req, res, next) {
   console.log(err.stack);
   res.render('error');
 });
+
+// Initialize ticker background processes
+ticker.init(db); 
 
 
 module.exports = app;

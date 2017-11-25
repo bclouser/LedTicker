@@ -1,63 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
-var zmq = require('zeromq')
-var sock = zmq.socket('pub');
-
-// pubber.js
-sock.bindSync("tcp://*:5556");
-console.log('Publisher bound to port 5556');
+var ticker = require("../tickerInterface.js");
 
 // create application/json parser
 var jsonParser = bodyParser.json();
-
-function publishToTicker(tickerData){
-    var monthName = new Array();
-    monthName[0] = "January";
-    monthName[1] = "February";
-    monthName[2] = "March";
-    monthName[3] = "April";
-    monthName[4] = "May";
-    monthName[5] = "June";
-    monthName[6] = "July";
-    monthName[7] = "August";
-    monthName[8] = "September";
-    monthName[9] = "October";
-    monthName[10] = "November";
-    monthName[11] = "December";
-
-    var dayOfWeek = new Array();
-    dayOfWeek[0] = "Sun";
-    dayOfWeek[1] = "Mon";
-    dayOfWeek[2] = "Tues";
-    dayOfWeek[3] = "Wed";
-    dayOfWeek[4] = "Thurs";
-    dayOfWeek[5] = "Fri";
-    dayOfWeek[6] = "Sat";
-    
-    var date = new Date();
-    var yesterday = new Date();
-    yesterday.setDate(date.getDate() - 1);
-    var yesterdayName = dayOfWeek[yesterday.getDay()];
-    var lastMonth = new Date();
-    lastMonth.setMonth(date.getMonth() - 1);
-    lastMonthName = monthName[lastMonth.getMonth()];
-
-    var dailyProcessed = tickerData["dailyProcessed"];
-    var monthlyProcessed = tickerData["monthlyProcessed"];
-    var totalProcessed = tickerData["totalProcessed"];
-    var numRestaurants = tickerData["numRestaurants"];
-    var railsInField = tickerData["railsInField"];
-    var beerPoured = tickerData["beerPoured"];
-    var announcement = tickerData["announcement"];
-    // &c544704&eBENC Slip me some &eRANR&eRANR&eRANR&eRANR!!!
-
-    var tickerString = "&c14552F&eMONY&eMONY&eMONY&eMONY Yesterday("+yesterdayName+"): $"+dailyProcessed.toFixed(2) +", In "+lastMonthName+": $"+monthlyProcessed.toFixed(2)+", To Date: $"+totalProcessed.toFixed(2)+", &c14552FRestaurants: "+numRestaurants+", Deployed Rails: "+railsInField+", &cD2A9E3&eBEER&eBEER&eBEER&eBEER&eBEER&eBEER Keg Poured: "+beerPoured+" gallons. "+announcement;
-    console.log("TICKERSTRING: \n" + tickerString + "\n");
-
-    sock.send(['tickerData', tickerString]);
-    console.log("published message to ticker");
-}
 
 function validateAndParseParam(key, value){
     var validParams = {
@@ -128,6 +75,8 @@ router.post('/update/:fieldName&:fieldValue', jsonParser, function(req, res) {
                     res.json({"success":false,"error": err.stack});
                 }
                 else{
+                    // Build and publish the tickerString 
+                    ticker.publishToTicker(doc);
                     // Success
                     res.json({"success":true});
                 }
@@ -170,7 +119,7 @@ router.post('/update', function(req, res) {
     collection.findOne({"name" : "tablesafe"},{},function(err,activeDoc){
         if(err){
             console.log(err.stack);
-            res.rendor('error', err.stack);
+            res.render('error', err.stack);
         }
         if(activeDoc == null){
             console.log("Database doesn't contain any documents yet...");
@@ -199,7 +148,7 @@ router.post('/update', function(req, res) {
         }
 
         // Build and publish the tickerString 
-        publishToTicker(activeDoc);
+        ticker.publishToTicker(activeDoc);
 
         collection.update(
             {"name" : "tablesafe"},
