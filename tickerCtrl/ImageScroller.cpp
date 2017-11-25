@@ -70,9 +70,7 @@ bool ImageScroller::ParsePPM(const char* filename, ImageScroller::Image& img){
     if (!line || sscanf(line, "%d ", &value) != 1 || value != 255)
         EXIT_WITH_MSG("Only 255 for maxval allowed.");
     const size_t pixel_count = new_width * new_height;
-    std::cout << "ppm width: " << new_width << " height " << new_height << " pixel_count " << pixel_count << std::endl;
     Pixel *new_image = new Pixel [ pixel_count ];
-    std::cout << "address when parsing ppm: " << (unsigned int)new_image << std::endl;
     assert(sizeof(Pixel) == 3);   // we make that assumption.
     if (fread(new_image, sizeof(Pixel), pixel_count, f) != pixel_count) {
         line = "";
@@ -80,8 +78,7 @@ bool ImageScroller::ParsePPM(const char* filename, ImageScroller::Image& img){
     }
 #undef EXIT_WITH_MSG
     fclose(f);
-    fprintf(stderr, "Read image '%s' with %dx%d\n", filename,
-                    new_width, new_height);
+    //fprintf(stderr, "Read image '%s' with %dx%d\n", filename, new_width, new_height);
     img.width = new_width;
     img.height = new_height;
     img.image = new_image;

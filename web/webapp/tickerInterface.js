@@ -151,8 +151,7 @@ exports.init = function(db, interval_seconds){
 	// Once every two hours we should update the database with the latest snow info
 	setInterval(function(){
 		snow.getAllWashingtonMtns(onMountainData);
-	//}, 2* 60 * 60 * 1000);
-	}, 60 * 1000);
+	}, 2* 60 * 60 * 1000);
 
 	// Send out a ticker update right now with whatever is in the db
     var collection = database.get('tickerData');

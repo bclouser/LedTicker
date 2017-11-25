@@ -3,13 +3,17 @@
 
 # Just take care of all the things that need to be done on startup
 
+# Install mongodb
+# sudo apt-get install mongodb
 # Create database
 
 #Add users to that database
-# use LedTicker
+# use ledTicker
 # db.createUser({user:"someUser", pwd:"somePassword", roles:["readWrite"]})
 
 # db.createCollection("tickerData")
+
+# npm install
 
 
 mkdir certs

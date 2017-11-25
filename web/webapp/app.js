@@ -25,7 +25,8 @@ if((passwd.api.user === undefined)||(passwd.api.password === undefined) ||
 
 console.log("Db user: " + passwd.db.user)
 console.log("Db password: " + passwd.db.password)
-var db = monk(''+passwd.db.user+':'+passwd.db.password+'@localhost:27017/ledTicker');
+//var db = monk(''+passwd.db.user+':'+passwd.db.password+'@localhost:27017/ledTicker');
+var db = monk('localhost:27017/ledTicker');
 
 // var db = monk('localhost:27017/ledTicker',{
 //   username : passwd.db.user,

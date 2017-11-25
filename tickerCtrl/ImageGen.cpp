@@ -42,7 +42,6 @@ bool ImageGen::getFilesInFolder(const std::string& dir, std::unordered_map<std::
     }
 
     while ((dirp = readdir(dp)) != NULL) {
-    	std::cout << "Found file " << dirp->d_name << std::endl;
         filesMap[std::string(dirp->d_name)] = true;
     }
     closedir(dp);
@@ -94,7 +93,6 @@ bool ImageGen::getEmoji(std::string emojiFileName, ImageScroller::Image& outImg)
 	// }
 
 	std::string emojiPath(emojiDir + std::string("/") + emojiFileName);
-	std::cout << "emojiPath = " << emojiPath << std::endl;
 
 	if(!ImageScroller::ParsePPM(emojiPath.c_str(), outImg)){
 		std::cout << "Failed to parse ppm emoji image" <<std::endl;
@@ -249,7 +247,6 @@ bool ImageGen::createImageFromEncodedString(std::string& encodedString, ImageScr
 	        // First figure out what kind of item we are dealing with here (color, emoji, or char)
 	        // '&c' is a color sequence
 	        if(((*it) == '&') && ((*(it+1)) == 'c')){
-	        	std::cout << "start of color string" << std::endl;
 	            // updates the current color and  advances string index to next item
 	            if(!extractTextColor(it, currentTextColor)){
 	                std::cout << "Bad color string specified" << std::endl;
@@ -262,7 +259,6 @@ bool ImageGen::createImageFromEncodedString(std::string& encodedString, ImageScr
 	        else if(*it == ':'){
 	        	std::string emojiStr = parseEmojiString(std::string(it, encodedString.end()));
 	        	std::string emojiFile = emojiStr + std::string(".ppm");
-	        	std::cout << "emojiFile = " << emojiFile << std::endl;
 
 	        	if(emojiStr.size()>0){
 		        	// +2 for the leading and trailing colons
@@ -295,8 +291,6 @@ bool ImageGen::createImageFromEncodedString(std::string& encodedString, ImageScr
 	        		continue;
 	        	}
 	        }
-
-	        std::cout << "updating imageBlock: width = " << imageBlock.width << " height " << imageBlock.height << std::endl;
 	      
 	        // TODO: Make this suck less. sCheck that we have enough room in our buffer for the next image segment
 	        if(((currentWidth + imageBlock.width) * 16) > MAX_NUM_PIXELS){
