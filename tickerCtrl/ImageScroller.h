@@ -5,6 +5,7 @@
 #include "threaded-canvas-manipulator.h"
 #include "transformer.h"
 #include "graphics.h"
+#include <iostream>
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -53,12 +54,15 @@ public:
     };
     
     bool LoadPPM(const char *filename);
+    static bool ParsePPM(const char* filename, ImageScroller::Image& img);
     bool reLoadPPM(){
         return LoadPPM(m_fileName);
     }
     bool UpdateImage(ImageScroller::Image& newImage);
-    void printImage(ImageScroller::Image& img);
+    static void printImageRange(ImageScroller::Image& img, int columnStart, int columnEnd);
+    static void printImage(ImageScroller::Image& img);
     void printImage();
+    static void saveImage(const char* filename, ImageScroller::Image& img);
     void Run();
 
 
@@ -66,7 +70,7 @@ public:
 
 
     // Read line, skip comments.
-    char *ReadLine(FILE *f, char *buffer, size_t len);
+    static char *ReadLine(FILE *f, char *buffer, size_t len);
 
     const int scroll_jumps_;
     const int scroll_ms_;

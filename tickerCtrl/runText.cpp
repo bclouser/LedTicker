@@ -12,6 +12,7 @@
 volatile bool interrupt_received = false;
 
 static void InterruptHandler(int signo) {
+    std::cout << "Received interrupt number: " << signo << std::endl;
     interrupt_received = true;
 }
 
@@ -134,15 +135,21 @@ int main(int argc, char *argv[]) {
     msgHandler.start();
 
     ImageGen imgGen;
+    if(!imgGen.init()){
+        std::cout << "Failed to initialize the image generator. Exiting";
+        return -1;
+    }
     ImageScroller::Image img;
-    std::string defaultStr("Ben says this is the default image");
+    std::string defaultStr("default image");
     // Move this around probably
     if(!imgGen.createImageFromEncodedString(defaultStr, img)){
         printf("Failed to create default image for the led screen\n");
     }
+    //ImageScroller::printImage(img);
     if( !imageScroller.UpdateImage(img) ){
         printf("Failed to update the image onto LED screen \n");
     }
+
 
     // Now, the image generation runs in the background. We can do arbitrary
     // things here in parallel. In this demo, we're essentially just

@@ -17,6 +17,7 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <fstream>
 
 using std::min;
 using std::max;
@@ -34,7 +35,19 @@ extern volatile bool interrupt_received;
 // This allows reload of an image while things are running, e.g. you can
 // live-update the content.
 bool ImageScroller::LoadPPM(const char *filename) {
-    m_fileName = filename;
+    m_fileName = filename;  
+    Image img;
+    if(!ParsePPM(m_fileName, img)){
+        return false;
+    }
+    
+    MutexLock l(&mutex_new_image_);
+    new_image_.Delete();  // in case we reload faster than is picked up
+    new_image_ = img; // Shallow copy is what we want here.
+    return true;
+}
+
+bool ImageScroller::ParsePPM(const char* filename, ImageScroller::Image& img){
     FILE *f = fopen(filename, "r");
     // check if file exists
     if (f == NULL && access(filename, F_OK) == -1) {
@@ -57,7 +70,9 @@ bool ImageScroller::LoadPPM(const char *filename) {
     if (!line || sscanf(line, "%d ", &value) != 1 || value != 255)
         EXIT_WITH_MSG("Only 255 for maxval allowed.");
     const size_t pixel_count = new_width * new_height;
+    std::cout << "ppm width: " << new_width << " height " << new_height << " pixel_count " << pixel_count << std::endl;
     Pixel *new_image = new Pixel [ pixel_count ];
+    std::cout << "address when parsing ppm: " << (unsigned int)new_image << std::endl;
     assert(sizeof(Pixel) == 3);   // we make that assumption.
     if (fread(new_image, sizeof(Pixel), pixel_count, f) != pixel_count) {
         line = "";
@@ -67,12 +82,34 @@ bool ImageScroller::LoadPPM(const char *filename) {
     fclose(f);
     fprintf(stderr, "Read image '%s' with %dx%d\n", filename,
                     new_width, new_height);
-    MutexLock l(&mutex_new_image_);
-    new_image_.Delete();  // in case we reload faster than is picked up
-    new_image_.image = new_image;
-    new_image_.width = new_width;
-    new_image_.height = new_height;
+    img.width = new_width;
+    img.height = new_height;
+    img.image = new_image;
     return true;
+}
+
+void ImageScroller::printImageRange(ImageScroller::Image& img, int columnStart, int columnEnd){
+    if(columnStart > columnEnd){
+        return;
+    }
+    std::cout << "== Printing Columns Pretty ==" << std::endl;
+    std::cout << "Starting Column: " << columnStart << "\n";
+    std::cout << "Ending Column: " << columnEnd << "\n";
+    if(columnEnd > img.width){
+        columnEnd = img.width;
+    }
+    for(int row = 0; row < img.height; ++row){
+        std::cout << std::setfill('0') << std::setw(2) << row << " |";
+        for(int column=columnStart; column < columnEnd; ++column){
+            int currentIndex = row*img.width + column;
+            if(img.image[currentIndex].red || img.image[currentIndex].green || img.image[currentIndex].blue){
+                std::cout <<"*"<< "|";
+            }else{
+                std::cout << " " << "|";
+            }
+        }
+        std::cout <<"\n";
+    }
 }
 
 void ImageScroller::printImage(ImageScroller::Image& img){
@@ -111,6 +148,30 @@ void ImageScroller::printImage(){
     }
 }
 
+void ImageScroller::saveImage(const char* filename, ImageScroller::Image& img){
+    std::ofstream file(filename, std::ios_base::out);
+    if((!file.good()) || (!file.is_open())){
+        std::cout << "Failed to open file '" << filename << "'" << std::endl;
+        return;
+    }
+    std::cout << "Image Height: " << img.height << "\n";
+    std::cout << "Image Width: " << img.width << "\n";
+    for(int row = 0; row < img.height; ++row){
+        file << std::setfill('0') << std::setw(2) << row << " |";
+        for(int column=0; column < img.width; ++column){
+            int currentIndex = row*img.width + column;
+            if(img.image[currentIndex].red || img.image[currentIndex].green || img.image[currentIndex].blue){
+                file <<"*"<< "|";
+            }else{
+                file << " " << "|";
+            }
+        }
+        file <<"\n";
+    }
+    file.close();
+    std::cout << "Done writing file" << std::endl;
+}
+
 bool ImageScroller::UpdateImage(ImageScroller::Image& newImage){
     MutexLock l(&mutex_new_image_);
     new_image_.Delete();  // in case we reload faster than is picked up
@@ -142,6 +203,7 @@ void ImageScroller::Run() {
         }
         // Not sure why this is here
         if (!current_image_.IsValid()) {
+            std::cout << "Current image is invalid" << std::endl;
             usleep(100 * 1000);
             continue;
         }
@@ -152,7 +214,7 @@ void ImageScroller::Run() {
         //printf("current_image_.width = %d\n", current_image_.width);
         for (int x = 0; x < screen_width; ++x) {
             // Check for when we have completely scrolled the image off the screen.
-            if((horizontal_position_+x) == (current_image_.width + screen_width)) {
+            if((horizontal_position_+x) > (current_image_.width + screen_width)) {
                 // reset horizontal_position
                 horizontal_position_ = (-screen_width);
                 imageOffScreen = true;
@@ -163,7 +225,7 @@ void ImageScroller::Run() {
                     offscreen_->SetPixel(x, y, 0, 0, 0);
                 }
                 // when we roll off the edge
-                else if (horizontal_position_+x > current_image_.width){
+                else if (horizontal_position_+x >= current_image_.width){
                     offscreen_->SetPixel(x, y, 0, 0, 0);
                 }
                 else{

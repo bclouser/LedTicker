@@ -16,6 +16,10 @@
 	    subscriber.setsockopt(ZMQ_SUBSCRIBE, tickerFilter, 10);
 
 	    ImageGen imgGen; // Potentially don't need to even have a class that requires instance if it doesn't have state.
+	    if(!imgGen.init()){
+	    	std::cout << "Failed to initialize image generator. Thats bad. Exiting thread" << std::endl;
+	    	return;
+	    }
 	    ImageScroller::Image img; // Potentially bad scope of this image... if this thread dies :(
 
 	    while (!msgHandler->m_killThread) {
@@ -45,7 +49,7 @@
 		        if(!msgHandler->m_imgScroller.UpdateImage(img)){
 		        	std::cout << "Failed to update image into the image scroller" << std::endl;
 		        }
-		    	//msgHandler->m_imgScroller.printImage(img);
+		    	//ImageScroller::printImage(img);
 	        }
 	    }
 	}
