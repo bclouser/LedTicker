@@ -28,18 +28,18 @@ Inside the database things look like this:
 
 exports.publishToTicker = function(tickerData){
     var monthName = new Array();
-    monthName[0] = "January";
-    monthName[1] = "February";
-    monthName[2] = "March";
-    monthName[3] = "April";
+    monthName[0] = "Jan";
+    monthName[1] = "Feb";
+    monthName[2] = "Mar";
+    monthName[3] = "Apr";
     monthName[4] = "May";
     monthName[5] = "June";
     monthName[6] = "July";
-    monthName[7] = "August";
-    monthName[8] = "September";
-    monthName[9] = "October";
-    monthName[10] = "November";
-    monthName[11] = "December";
+    monthName[7] = "Aug";
+    monthName[8] = "Sept";
+    monthName[9] = "Oct";
+    monthName[10] = "Nov";
+    monthName[11] = "Dec";
 
     var dayOfWeek = new Array();
     dayOfWeek[0] = "Sun";
@@ -49,6 +49,9 @@ exports.publishToTicker = function(tickerData){
     dayOfWeek[4] = "Thurs";
     dayOfWeek[5] = "Fri";
     dayOfWeek[6] = "Sat";
+
+    console.log("Here is the data we are sending to the ticker\n");
+    console.log(tickerData);
     
     var date = new Date();
     var yesterday = new Date();
@@ -73,28 +76,40 @@ exports.publishToTicker = function(tickerData){
     if(railsInField==null){ railsInField = 0;}
     if(beerPoured==null){ beerPoured = 0;}
 
+    // TODO: Handle Weather
     if(tickerData["mountainData"]){
 	    // Ski Mountain Stuff
 		stevensSnowAccum = tickerData["mountainData"]["stevens-pass-resort"].snowTodayInches;
 		stevensTemp = tickerData["mountainData"]["stevens-pass-resort"].temperatureBase;
-		stevensWeather = tickerData["mountainData"]["stevens-pass-resort"].weatherBase;
+		//stevensWeather = tickerData["mountainData"]["stevens-pass-resort"].weatherBase;
+		stevensWeather = ":partly_sunny:";
 		crystalSnowAccum = tickerData["mountainData"]["crystal-mountain-wa"].snowTodayInches;
 		crystalTemp = tickerData["mountainData"]["crystal-mountain-wa"].temperatureBase;
-		crystalWeather = tickerData["mountainData"]["crystal-mountain-wa"].weatherBase;
+		//crystalWeather = tickerData["mountainData"]["crystal-mountain-wa"].weatherBase;
+		crystalWeather = ":partly_sunny:";
 		mtBakerSnowAccum = tickerData["mountainData"]["mt-baker"].snowTodayInches;
 		mtBakerTemp = tickerData["mountainData"]["mt-baker"].temperatureBase;
-		mtBakerWeather = tickerData["mountainData"]["mt-baker"].weatherBase;
+		//mtBakerWeather = tickerData["mountainData"]["mt-baker"].weatherBase;
+		mtBakerWeather = ":partly_sunny:";
 		snoqualmieSnowAccum = tickerData["mountainData"]["the-summit-at-snoqualmie"].snowTodayInches;
 		snoqualmieTemp = tickerData["mountainData"]["the-summit-at-snoqualmie"].temperatureBase;
-		snoqualmieWeather = tickerData["mountainData"]["the-summit-at-snoqualmie"].weatherBase;
+		//snoqualmieWeather = tickerData["mountainData"]["the-summit-at-snoqualmie"].weatherBase;
+		snoqualmieWeather = ":partly_sunny:";
 	}
     
+    // TODO: Handle monthly icons
+    /*
+	month[0] = 
+	month[1] =
+	month[2] = // st patricks
+	month[3] = 
+    */
 
-    var tickerString = "&c14552F:money::moneybag::money::moneybag: Yesterday("+yesterdayName+"): $"+dailyProcessed.toFixed(2) +", In "+lastMonthName+": $"+monthlyProcessed.toFixed(2)+", To Date: $"+totalProcessed.toFixed(2)+", &c14552FRestaurants: "+numRestaurants+", Deployed Rails: "+railsInField+", &cD2A9E3:beer::beer::beer::beer::beer::beer: Keg Poured: "+beerPoured+" gallons. "+announcement+ " :snowflake::snowflake:"+
-    	" Crystal: "+crystalWeather+", "+crystalTemp+", snowfall "+crystalSnowAccum+"\"." +
-    	" Stevens Pass: "+stevensWeather+", "+stevensTemp+", snowfall "+stevensSnowAccum+"\"." +
-    	" Snoqualmie: "+snoqualmieWeather+", "+snoqualmieTemp+", snowfall "+snoqualmieSnowAccum+"\"." +
-    	" Mt Baker: "+mtBakerWeather+", "+mtBakerTemp+", snowfall "+mtBakerSnowAccum+"\""
+    var tickerString = "&cF0C320 :moneybag::moneybag::moneybag::moneybag: "+yesterdayName+": $"+dailyProcessed.toFixed(2) +"  :jack_o_lantern: "+lastMonthName+": $"+monthlyProcessed.toFixed(2)+" :moneybag::dollar::moneybag: Total: $"+totalProcessed.toFixed(2)+"    :hamburger::fries::spaghetti: Sites: "+numRestaurants+"  :iphone::iphone::iphone: Rails: "+railsInField+"   :beer::beer::beer::beer: Keg: "+beerPoured+" gals   "+announcement+ "&cD2A9E3   :mountain_cableway: :snowboarder: :mountain_cableway: "+
+    	" Cryst: "+crystalWeather+" "+crystalTemp+", "+crystalSnowAccum+"\" :snowflake:" +
+    	" Stevs: "+stevensWeather+" "+stevensTemp+", "+stevensSnowAccum+"\" :snowflake:" +
+    	" Snoq: "+snoqualmieWeather+" "+snoqualmieTemp+", "+snoqualmieSnowAccum+"\" :snowflake:" +
+    	" Baker: "+mtBakerWeather+" "+mtBakerTemp+", "+mtBakerSnowAccum+"\" :snowflake:"
 
     console.log("Sending message to ticker: \n" + tickerString + "\n");
 
@@ -120,14 +135,14 @@ var onMountainData = function(err, inMtnData){
 		collection.findOne({"name" : "tablesafe"},{},function(err,doc){
 			if(err){
 				console.log(err.stack);
-				res.json({"success":false, "error": err.stack});
+				return;
 			}
 		    doc["mountainData"] = mtnData;
 		    collection.update(
 			{"name" : "tablesafe"},
 			doc,
 			{"upsert":true},
-			function (err, doc) {
+			function (err, d) {
 				if (err) {
 					console.log("There was an error updating Mountain data in the db");
 					console.log(err.stack);
