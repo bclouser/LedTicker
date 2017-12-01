@@ -1,3 +1,4 @@
+var os = require('os');
 var zmq = require('zeromq')
 var sock = zmq.socket('pub');
 var snow = require("./onTheSnow.js");
@@ -49,9 +50,6 @@ exports.publishToTicker = function(tickerData){
     dayOfWeek[4] = "Thurs";
     dayOfWeek[5] = "Fri";
     dayOfWeek[6] = "Sat";
-
-    console.log("Here is the data we are sending to the ticker\n");
-    console.log(tickerData);
     
     var date = new Date();
     var yesterday = new Date();
@@ -105,7 +103,7 @@ exports.publishToTicker = function(tickerData){
 	month[3] = 
     */
 
-    var tickerString = "&cF0C320 :moneybag::moneybag::moneybag::moneybag: "+yesterdayName+": $"+dailyProcessed.toFixed(2) +"  :jack_o_lantern: "+lastMonthName+": $"+monthlyProcessed.toFixed(2)+" :moneybag::dollar::moneybag: Total: $"+totalProcessed.toFixed(2)+"    :hamburger::fries::spaghetti: Sites: "+numRestaurants+"  :iphone::iphone::iphone: Rails: "+railsInField+"   :beer::beer::beer::beer: Keg: "+beerPoured+" gals   "+announcement+ "&cD2A9E3   :mountain_cableway: :snowboarder: :mountain_cableway: "+
+    var tickerString = "&cF0C320 :moneybag::moneybag::moneybag::moneybag: "+yesterdayName+": $"+dailyProcessed.toFixed(2) +"  :jack_o_lantern:"+lastMonthName+": $"+monthlyProcessed.toFixed(2)+" :moneybag::dollar::moneybag: Total: $"+totalProcessed.toFixed(2)+"    :hamburger::fries::spaghetti: Sites: "+numRestaurants+"  :iphone::iphone::iphone: Rails: "+railsInField+"   :beer::beer::beer::beer: Keg: "+beerPoured+" gals   "+announcement+ "&cD2A9E3   :mountain_cableway: :snowboarder: :mountain_cableway: "+
     	" Cryst: "+crystalWeather+" "+crystalTemp+", "+crystalSnowAccum+"\" :snowflake:" +
     	" Stevs: "+stevensWeather+" "+stevensTemp+", "+stevensSnowAccum+"\" :snowflake:" +
     	" Snoq: "+snoqualmieWeather+" "+snoqualmieTemp+", "+snoqualmieSnowAccum+"\" :snowflake:" +
@@ -160,6 +158,47 @@ exports.init = function(db, interval_seconds){
 	// These two need to be globals
 	database = db;
 	publish = this.publishToTicker;
+
+	// First thing we do is a put the ip address on the ticker
+	var interfaces = os.networkInterfaces();
+	var addresses = [];
+	wlanIpAddress = ""
+	for (var k in interfaces) {
+		console.log(k);
+		if(k == "wlan0"){
+		    for (var k2 in interfaces[k]) {
+		        var address = interfaces[k][k2];
+		        if (address.family === 'IPv4' && !address.internal) {
+		        	wlanIpAddress = address.address;
+		            //addresses.push(address.address);
+		        }
+		    }
+		}
+	}
+
+	// Insert Ip Address as the announcement in the database
+	var collection = db.get('tickerData');
+	collection.findOne({"name" : "tablesafe"},{},function(err,doc){
+		if(err){
+			console.log(err.stack);
+			return;
+		}
+	    doc["announcement"] = wlanIpAddress;
+	    collection.update(
+		{"name" : "tablesafe"},
+		doc,
+		{"upsert":true},
+		function (err, d) {
+			if (err) {
+				console.log("There was an error updating the announcement in the db");
+				console.log(err.stack);
+				return;
+			}
+			// Update ticker with the latest stuff.
+			publish(doc);
+		});
+	});
+
 	console.log("Kickoff Ski Mountain data retrieval");
 	// call it once first to get things updated initially.
 	snow.getAllWashingtonMtns(onMountainData);
