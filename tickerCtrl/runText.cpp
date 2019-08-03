@@ -84,17 +84,21 @@ int main(int argc, char *argv[]) {
         imageFilePath = argv[optind];
         printf("setting imageFilePath to be %s\n", imageFilePath);
     }
-
+    printf("initial wit\n");
     if (rotation % 90 != 0) {
         fprintf(stderr, TERM_ERR "Rotation %d not allowed! "
                         "Only 0, 90, 180 and 270 are possible.\n" TERM_NORM, rotation);
         return 1;
     }
 
+    printf("Creating matrix\n");
     RGBMatrix *matrix = CreateMatrixFromOptions(matrix_options, runtime_opt);
-    if (matrix == NULL)
+    if (matrix == NULL){
+        printf("Failed to create matrix\n");
         return 1;
+    }
 
+printf("something witty\n");
     if (large_display) {
         // Mapping the coordinates of a 32x128 display mapped to a square of 64x64.
         // Or any other U-arrangement.

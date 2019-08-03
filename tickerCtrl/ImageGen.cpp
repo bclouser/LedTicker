@@ -209,6 +209,7 @@ bool ImageGen::createImageFromEncodedString(std::string& encodedString, ImageScr
     // TODO, really should do this elsewhere... Maybe a load font method
     if(!font.LoadFont("./fonts/9x15.bdf")){
         std::cout << "Failed to load font" << std::endl;
+        return false;
     }
 
     // Color of specified text

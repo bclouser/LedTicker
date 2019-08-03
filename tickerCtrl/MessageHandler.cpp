@@ -13,6 +13,7 @@
 	    zmq::socket_t subscriber (context, ZMQ_SUB);
 	    subscriber.connect("tcp://127.0.0.1:5556");
 	    const char* tickerFilter = "tickerData";
+	    std::cout << "Starting zmq listener" << std::endl;
 	    subscriber.setsockopt(ZMQ_SUBSCRIBE, tickerFilter, 10);
 
 	    ImageGen imgGen; // Potentially don't need to even have a class that requires instance if it doesn't have state.
@@ -29,28 +30,25 @@
 	        if(!subscriber.recv(&msg)){
 	        	std::cout << "Something bad happened while waiting for message" << std::endl;
 	        }
+	        std::cout << "Got new message!" <<std::endl;
 
 	        //std::istringstream iss(static_cast<char*>(msg.data()));
-	        std::string filter((char*)msg.data(), msg.size());
+	        std::string message((char*)msg.data(), msg.size());
 
-	        if(filter == tickerFilter){
-	        	//  pull out the data from subscription
-	        	if(!subscriber.recv(&msg)){
-	        		std::cout << "Something bad happened while pulling out data" << std::endl;
-	        	}
+	        // Remove the filter from the beginning of the message
+	        message.erase(0,std::string(tickerFilter).size());
 
-	        	std::string buf(static_cast<char*>(msg.data()), msg.size());
-	        	//std::cout << "size buf = " << msg.size() << " Received: "<< buf << std::endl;
-		
-		        if(!imgGen.createImageFromEncodedString(buf, img)){
-		        	std::cout << "Failed to create the image from encoded string" << std::endl;
-		        }
-
-		        if(!msgHandler->m_imgScroller.UpdateImage(img)){
-		        	std::cout << "Failed to update image into the image scroller" << std::endl;
-		        }
-		    	//ImageScroller::printImage(img);
+        	std::cout << "size message = " << message.size() << " Received: "<< message << std::endl;
+	
+	        if(!imgGen.createImageFromEncodedString(message, img)){
+	        	std::cout << "Failed to create the image from encoded string" << std::endl;
 	        }
+
+	        if(!msgHandler->m_imgScroller.UpdateImage(img)){
+	        	std::cout << "Failed to update image into the image scroller" << std::endl;
+	        }
+	    	//ImageScroller::printImage(img);
+	        
 	    }
 	}
 
