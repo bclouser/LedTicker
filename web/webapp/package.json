@@ -16,7 +16,7 @@
     "http-auth": "^3.2.3",
     "mongodb": "^2.2.25",
     "monk": "^4.0.0",
-    "morgan": "~1.7.0",
+    "morgan": "~1.9.1",
     "pug": "^2.0.0-rc.4",
     "serve-favicon": "~2.3.2",
     "socket.io": "^2.0.3",
